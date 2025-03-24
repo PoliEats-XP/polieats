@@ -49,6 +49,17 @@ Replace `<component-name>` with the desired component (e.g., `button`, `card`, e
 
 For more information on available components, visit the official documentation: [shadcn/ui](https://shadcn.dev/docs).
 
+### Authentication using better-auth
+
+This project uses BetterAuth, a modern and extensible authentication framework for Next.js.
+
+On this project, BetterAuth is already basically setted-up (you just need to setup your own env variables)
+
+```bash
+BETTER_AUTH_SECRET=''
+BETTER_AUTH_URL=http://localhost:3000
+```
+
 ## Project Structure
 
 Here's a brief overview of the key directories and files in the project:
