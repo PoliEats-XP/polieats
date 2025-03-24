@@ -122,4 +122,12 @@ For more details, check the [TailwindCSS Documentation](https://tailwindcss.com/
 
 ---
 
+## Contributing to **Polieats**
+
+We appreciate your interest in contributing to **Polieats**! If you'd like to contribute, please follow our guidelines and instructions in the [CONTRIBUTING](CONTRIBUTING.md) file.
+
+Whether you’re a project developer or an external contributor, the guide will walk you through the steps to get started.
+
+---
+
 If you have any questions or issues, please refer to the respective documentation links or open an issue in the repository.
