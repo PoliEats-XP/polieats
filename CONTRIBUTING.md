@@ -12,21 +12,21 @@ We welcome contributions to **PoliEats**! Whether you're fixing a bug, adding a 
 
 2. **Create a new branch** (Use a meaningful name)
 
-```sh
-git checkout -b feature/my-new-feature
-```
+   ```sh
+   git checkout -b feature/my-new-feature
+   ```
 
 3. Make your changes and commit with a clear message
 
-```sh
-git commit -m "feat: add support for X"
-```
+   ```sh
+   git commit -m "feat: add support for X"
+   ```
 
 4. **Push your branch** and open a new pull request
 
-```sh
-git push origin feature/my-new-feature
-```
+   ```sh
+   git push origin feature/my-new-feature
+   ```
 
 5. Once reviewed, your changes **will be** merged! 🎉
 
@@ -36,28 +36,28 @@ git push origin feature/my-new-feature
 
 2. **Close your fork**
 
-```sh
-git clone https://github.com/YOUR-OWN-USERNAME/polieats.git
-cd polieats
-```
+   ```sh
+   git clone https://github.com/YOUR-OWN-USERNAME/polieats.git
+   cd polieats
+   ```
 
 3. **Create a new branch** for your changes
 
-```sh
-git checkout -b fix/bug-123
-```
+   ```sh
+   git checkout -b fix/bug-123
+   ```
 
 4. Make your changes and commit with a clear message
 
-```sh
-git commit -m "fix: resolved issue #123"
-```
+   ```sh
+   git commit -m "fix: resolved issue #123"
+   ```
 
 5. **Push to your fork**
 
-```sh
-git push origin fix/bug-123
-```
+   ```sh
+   git push origin fix/bug-123
+   ```
 
 6. Open a **Pull Request** from your fork to our `main` branch
 
