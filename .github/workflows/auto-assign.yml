@@ -24,9 +24,17 @@ jobs:
         script: |
           const { owner, repo } = context.repo;
           const pull_number = context.payload.pull_request.number;
-          await github.rest.pulls.requestReviewers({
-            owner,
-            repo,
-            pull_number,
-            reviewers: ['gbrasil720']
-          });
+          const author = context.payload.pull_request.user.login;
+
+          const reviewer = 'gbrasil720';
+          if (author !== reviewer) {
+            await github.rest.pulls.requestReviewers({
+              owner,
+              repo,
+              pull_number,
+              reviewers: [reviewer]
+            });
+          console.log(`Reviewer ${reviewer} successfully requested.`);
+          } else {
+            console.log('Cannot request review from the pull request author.');
+          }
