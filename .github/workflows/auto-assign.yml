@@ -1,0 +1,32 @@
+name: Auto Assign
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - name: 'Auto-assign issue or pull request'
+      uses: pozil/auto-assign-issue@v1
+      with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          assignees: gbrasil720
+          numOfAssignee: 1
+    - name: 'Add reviewer to pull requests'
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const pull_number = context.payload.pull_request.number;
+          await github.rest.pulls.requestReviewers({
+            owner,
+            repo,
+            pull_number,
+            reviewers: ['gbrasil720']
+          });
