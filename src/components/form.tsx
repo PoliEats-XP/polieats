@@ -18,6 +18,7 @@ import { LoginButton } from './login-button'
 import Link from 'next/link'
 import { OrLine } from './or-line'
 import { GoogleLoginButton } from './google-login-button'
+import { toast } from 'sonner'
 
 export function Form() {
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -28,7 +29,9 @@ export function Form() {
 		},
 	})
 
-	function onSubmit(values: z.infer<typeof formSchema>) {}
+	function onSubmit(values: z.infer<typeof formSchema>) {
+		toast.success('Login realizado com sucesso!')
+	}
 
 	return (
 		<FormComponent {...form}>

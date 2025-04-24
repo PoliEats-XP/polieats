@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Ubuntu } from 'next/font/google'
 import './globals.css'
+import { Toaster } from 'sonner'
 
 const ubuntu = Ubuntu({
 	weight: ['300', '400', '500'],
@@ -19,7 +20,10 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${ubuntu.className} antialiased`}>{children}</body>
+			<body className={`${ubuntu.className} antialiased`}>
+				<main>{children}</main>
+				<Toaster />
+			</body>
 		</html>
 	)
 }
