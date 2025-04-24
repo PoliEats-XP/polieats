@@ -1,3 +1,4 @@
+import { Form } from '@/components/form'
 import Image from 'next/image'
 
 export default function Login() {
@@ -13,9 +14,11 @@ export default function Login() {
 				polieats
 			</h1>
 
-			<p className="text-lg text-[#7D7D7D] font-light">
+			<p className="text-lg text-[#7D7D7D] font-light mb-6">
 				Bem-vindo de volta, faça login para continuar
 			</p>
+
+			<Form />
 		</div>
 	)
 }
