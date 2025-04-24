@@ -19,8 +19,15 @@ import Link from 'next/link'
 import { OrLine } from './or-line'
 import { GoogleLoginButton } from './google-login-button'
 import { toast } from 'sonner'
+import { useRouter } from 'next/router'
+import { useAuthState } from '@/hooks/useAuthState'
+import { signIn } from '@/lib/auth-client'
+
 
 export function Form() {
+	const router = useRouter()
+	const { error, success, loading, setSuccess, setError, setLoading, resetState } = useAuthState();
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -29,8 +36,29 @@ export function Form() {
 		},
 	})
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		toast.success('Login realizado com sucesso!')
+	async function onSubmit(values: z.infer<typeof formSchema>) {
+		try{
+			await signIn.email({
+				email: values.email,
+				password: values.password
+			}, {
+				onResponse: () =>{
+					setLoading(false)
+				},
+				onRequest: () => {
+					resetState()
+					setLoading(true)
+				},
+				onSuccess: (ctx) => {
+					setSuccess("LoggedIn successfully")
+					router.replace('/')
+				},
+			});
+		}catch(error){
+			console.log(error)
+			setError("Something get wrong")
+			setLoading(false)
+		}
 	}
 
 	return (
@@ -76,7 +104,7 @@ export function Form() {
 						</FormItem>
 					)}
 				/>
-				<LoginButton />
+				<LoginButton loading={loading} disabled={form.formState.isSubmitting}/>
 				<OrLine />
 				<GoogleLoginButton />
 				<div className="text-center -mt-7">
