@@ -15,6 +15,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { EmailInput } from './email-input'
 import { PasswordInput } from './password-input'
 import { LoginButton } from './login-button'
+import Link from 'next/link'
+import { OrLine } from './or-line'
+import { GoogleLoginButton } from './google-login-button'
 
 export function Form() {
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -54,14 +57,34 @@ export function Form() {
 								Senha
 							</FormLabel>
 							<FormControl>
-								{/* <EmailInput {...field} placeholder="email@email.com" /> */}
-								<PasswordInput {...field} placeholder="********" />
+								<div className="contents">
+									<PasswordInput {...field} placeholder="********" />
+									<div className="text-right">
+										<Link
+											href="/forgot-password"
+											className="text-xs text-[#7d7d7d] hover:text-[#7d7d7d/80] underline"
+										>
+											Esqueci minha senha
+										</Link>
+									</div>
+								</div>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
 					)}
 				/>
 				<LoginButton />
+				<OrLine />
+				<GoogleLoginButton />
+				<div className="text-center -mt-7">
+					<Link
+						href="/forgot-password"
+						className="text-xs text-[#7d7d7d] hover:text-[#7d7d7d/80] underline"
+					>
+						Não tem uma conta?{' '}
+						<span className="underline">Cadastre-se aqui</span>
+					</Link>
+				</div>
 			</form>
 		</FormComponent>
 	)
