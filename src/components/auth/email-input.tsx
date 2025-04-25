@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AtSign } from 'lucide-react'
-import { Input } from './ui/input'
+import { Input } from '../ui/input'
 import { cn } from '@/lib/utils'
 
 interface EmailInputProps {
@@ -34,7 +34,7 @@ export function EmailInput({
 				value={email}
 				onChange={handleChange}
 				className={cn(
-					'px-14 py-6 text-4xl placeholder:text-lg placeholder:text-[#BBBBBB] placeholder:font-light',
+					'px-14 py-6 lg:text-4xl placeholder:text-lg placeholder:text-[#BBBBBB] placeholder:font-light',
 					className
 				)}
 				disabled={disabled}
