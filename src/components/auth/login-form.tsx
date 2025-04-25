@@ -10,53 +10,71 @@ import {
 	FormMessage,
 } from '@/components/ui/form'
 import type { z } from 'zod'
-import { formSchema } from '@/lib/schemas/login.schema'
+import { loginFormSchema } from '@/lib/schemas/auth.schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EmailInput } from './email-input'
 import { PasswordInput } from './password-input'
-import { LoginButton } from './login-button'
+import { AuthenticateButton } from './login-button'
 import Link from 'next/link'
 import { OrLine } from './or-line'
 import { GoogleLoginButton } from './google-login-button'
 import { toast } from 'sonner'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useAuthState } from '@/hooks/useAuthState'
 import { signIn } from '@/lib/auth-client'
 
-
 export function Form() {
 	const router = useRouter()
-	const { error, success, loading, setSuccess, setError, setLoading, resetState } = useAuthState();
+	const {
+		error,
+		success,
+		loading,
+		setSuccess,
+		setError,
+		setLoading,
+		resetState,
+	} = useAuthState()
 
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
+	const form = useForm<z.infer<typeof loginFormSchema>>({
+		resolver: zodResolver(loginFormSchema),
 		defaultValues: {
 			email: '',
 			password: '',
 		},
 	})
 
-	async function onSubmit(values: z.infer<typeof formSchema>) {
-		try{
-			await signIn.email({
-				email: values.email,
-				password: values.password
-			}, {
-				onResponse: () =>{
-					setLoading(false)
+	async function onSubmit(values: z.infer<typeof loginFormSchema>) {
+		try {
+			await signIn.email(
+				{
+					email: values.email,
+					password: values.password,
 				},
-				onRequest: () => {
-					resetState()
-					setLoading(true)
-				},
-				onSuccess: (ctx) => {
-					setSuccess("LoggedIn successfully")
-					router.replace('/')
-				},
-			});
-		}catch(error){
+				{
+					onResponse: () => {
+						setLoading(false)
+					},
+					onRequest: () => {
+						resetState()
+						setLoading(true)
+					},
+					onSuccess: (ctx) => {
+						setSuccess('LoggedIn successfully')
+						setLoading(false)
+						toast.success('Login realizado com sucesso!')
+						router.push('/')
+					},
+					onError: (error) => {
+						setError(error.error.message)
+						setLoading(false)
+						toast.error('Erro ao realizar login!')
+					},
+				}
+			)
+		} catch (error) {
 			console.log(error)
-			setError("Something get wrong")
+			setError('Something get wrong')
+			toast.error('Erro ao realizar login!')
 			setLoading(false)
 		}
 	}
@@ -104,12 +122,17 @@ export function Form() {
 						</FormItem>
 					)}
 				/>
-				<LoginButton loading={loading} disabled={form.formState.isSubmitting}/>
+				<AuthenticateButton
+					loading={loading}
+					disabled={form.formState.isSubmitting}
+				>
+					Entrar
+				</AuthenticateButton>
 				<OrLine />
 				<GoogleLoginButton />
 				<div className="text-center -mt-7">
 					<Link
-						href="/forgot-password"
+						href="/register"
 						className="text-xs text-[#7d7d7d] hover:text-[#7d7d7d/80] underline"
 					>
 						Não tem uma conta?{' '}

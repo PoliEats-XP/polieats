@@ -44,7 +44,7 @@ export function PasswordInput({
 				value={password}
 				onChange={handleChange}
 				className={cn(
-					'pl-10 pr-10 px-14 py-6 placeholder:text-lg text-4xl placeholder:text-[#BBBBBB] placeholder:font-light',
+					'pl-10 pr-10 px-14 py-6 placeholder:text-lg lg:text-4xl placeholder:text-[#BBBBBB] placeholder:font-light',
 					className
 				)}
 				disabled={disabled}

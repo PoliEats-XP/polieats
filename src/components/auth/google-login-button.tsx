@@ -1,5 +1,5 @@
 import { Chrome } from 'lucide-react'
-import { Button } from './ui/button'
+import { Button } from '../ui/button'
 
 export function GoogleLoginButton() {
 	return (
