@@ -3,6 +3,7 @@
 import { registerFormSchema } from '@/lib/schemas/auth.schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { Turnstile } from '@marsidev/react-turnstile'
 import type { z } from 'zod'
 import {
 	Form as FormComponent,
@@ -153,6 +154,26 @@ export function RegisterForm() {
 								<div className="contents">
 									<PasswordInput {...field} placeholder="********" />
 								</div>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="captcha"
+					render={({ field }) => (
+						<FormItem>
+							<FormControl>
+								<Turnstile
+									siteKey="1x00000000000000000000AA" // Test site key (always pass)
+									options={{
+										action: 'submit-form',
+										theme: 'light',
+										language: 'pt',
+										size: 'flexible',
+									}}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
