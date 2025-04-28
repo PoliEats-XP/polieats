@@ -11,18 +11,16 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - name: 'Debug Info'
-      run: |
-        echo "Token Permissions: Issues - Write, Pull Requests - Write"
-        echo "Assignee: gbrasil720"
-        echo "Ensure that the assignee is a collaborator on the repository."
+    - name: 'Check GitHub Token Permissions'
+      run: gh auth status
 
     - name: 'Auto-assign issue or pull request'
-      uses: pozil/auto-assign-issue@v2
+      uses: pozil/auto-assign-issue@v1
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        assignees: gbrasil720
-        numOfAssignee: 1
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          assignees: gbrasil720
+          numOfAssignee: 1
+      continue-on-error: true # Allow the workflow to proceed even if this step fails.
 
     - name: 'Add reviewer to pull requests'
       if: github.event_name == 'pull_request'
