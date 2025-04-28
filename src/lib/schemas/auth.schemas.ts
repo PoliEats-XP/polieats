@@ -5,6 +5,7 @@ export const loginFormSchema = z.object({
 	password: z
 		.string()
 		.min(6, { message: 'Senha deve ter pelo menos 6 caracteres' }),
+	captcha: z.any(),
 })
 
 export const registerFormSchema = z.object({
@@ -17,4 +18,5 @@ export const registerFormSchema = z.object({
 	confirmPassword: z
 		.string()
 		.min(6, { message: 'Senha deve ter pelo menos 6 caracteres' }),
+	captcha: z.any(),
 })
