@@ -18,7 +18,7 @@ jobs:
         echo "Ensure that the assignee is a collaborator on the repository."
 
     - name: 'Auto-assign issue or pull request'
-      uses: pozil/auto-assign-issue@v1
+      uses: pozil/auto-assign-issue@v2
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         assignees: gbrasil720
