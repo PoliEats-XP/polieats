@@ -10,6 +10,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
+      contents: write
     steps:
     - name: 'Auto-assign issue or pull request'
       uses: pozil/auto-assign-issue@v1
@@ -17,6 +18,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: gbrasil720
           numOfAssignee: 1
+
     - name: 'Add reviewer to pull requests'
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v6
@@ -25,16 +27,19 @@ jobs:
           const { owner, repo } = context.repo;
           const pull_number = context.payload.pull_request.number;
           const author = context.payload.pull_request.user.login;
-
           const reviewer = 'gbrasil720';
           if (author !== reviewer) {
-            await github.rest.pulls.requestReviewers({
-              owner,
-              repo,
-              pull_number,
-              reviewers: [reviewer]
-            });
-          console.log(`Reviewer ${reviewer} successfully requested.`);
+            try {
+              await github.rest.pulls.requestReviewers({
+                owner,
+                repo,
+                pull_number,
+                reviewers: [reviewer]
+              });
+              console.log(`Reviewer ${reviewer} successfully requested.`);
+            } catch (err) {
+              console.error(`Failed to request reviewer: ${err.message}`);
+            }
           } else {
             console.log('Cannot request review from the pull request author.');
           }
