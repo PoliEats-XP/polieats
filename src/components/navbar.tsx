@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import { AvatarImage } from '@radix-ui/react-avatar'
+import { ThemeSwitcher } from './theme-switcher'
 
 export function Navbar() {
 	return (
@@ -18,7 +19,8 @@ export function Navbar() {
 				</h1>
 			</div>
 
-			<div>
+			<div className="flex items-center gap-4">
+				<ThemeSwitcher />
 				<Avatar>
 					<AvatarImage src="https://github.com/gbrasil720.png" />
 					<AvatarFallback>GB</AvatarFallback>

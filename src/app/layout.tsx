@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Ubuntu } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
+import { ThemeProvider } from '@/components/theme-provider'
 
 const ubuntu = Ubuntu({
 	weight: ['300', '400', '500'],
@@ -19,10 +20,19 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang="en">
-			<body className={`${ubuntu.className} antialiased`}>
-				<main>{children}</main>
-				<Toaster />
+		<html lang="en" suppressHydrationWarning>
+			<body
+				className={`${ubuntu.className} antialiased`}
+				suppressHydrationWarning
+			>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="light"
+					disableTransitionOnChange
+				>
+					<main>{children}</main>
+					<Toaster />
+				</ThemeProvider>
 			</body>
 		</html>
 	)
