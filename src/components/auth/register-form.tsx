@@ -24,8 +24,11 @@ import { toast } from 'sonner'
 import { signUp } from '@/lib/auth-client'
 import { useAuthState } from '@/hooks/useAuthState'
 import { useRouter } from 'next/navigation'
+import { useTheme } from 'next-themes'
 
 export function RegisterForm() {
+	const { theme } = useTheme()
+
 	const { loading, setLoading, resetState, setError, setSuccess } =
 		useAuthState()
 	const router = useRouter()
@@ -169,7 +172,7 @@ export function RegisterForm() {
 									siteKey="1x00000000000000000000AA" // Test site key (always pass)
 									options={{
 										action: 'submit-form',
-										theme: 'light',
+										theme: theme === 'dark' ? 'dark' : 'light',
 										language: 'pt',
 										size: 'flexible',
 									}}

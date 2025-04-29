@@ -1,3 +1,11 @@
+import { Navbar } from '@/components/navbar'
+
 export default function Home() {
-	return <h1>Hello PoliEats</h1>
+	return (
+		<>
+			<Navbar />
+
+			<h1>Hello World</h1>
+		</>
+	)
 }
