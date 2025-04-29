@@ -1,7 +1,17 @@
+'use client'
+
 import { AuthHero } from '@/components/auth/auth-hero'
 import { RegisterForm } from '@/components/auth/register-form'
+import { useIsMounted } from '@/hooks/useIsMounted'
+import { useEffect } from 'react'
 
 export default function Register() {
+	const isMounted = useIsMounted()
+
+	useEffect(() => {
+		isMounted()
+	}, [isMounted])
+
 	return (
 		<div className="flex flex-col items-center justify-center h-screen p-4 md:p-0 max-w-md mx-auto">
 			<AuthHero />
