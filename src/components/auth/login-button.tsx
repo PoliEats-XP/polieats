@@ -19,7 +19,7 @@ export function AuthenticateButton({
 			type="submit"
 			disabled={disabled || loading}
 			onClick={onClick}
-			className="-mt-3 text-white bg-gradient-to-r from-[#EB4834] from-0% to-[#F89C44] to-80% w-full font-normal py-5 cursor-pointer hover:opacity-80 transition-opacity duration-200 ease-in-out"
+			className="-mt-3 text-white bg-gradient-to-r from-[#ED2152] from-0% to-[#C71585] to-80% w-full font-normal py-5 cursor-pointer hover:opacity-80 transition-opacity duration-200 ease-in-out"
 		>
 			{loading ? (
 				<span className="ml-2">
