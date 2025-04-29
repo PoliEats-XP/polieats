@@ -23,8 +23,11 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useAuthState } from '@/hooks/useAuthState'
 import { signIn } from '@/lib/auth-client'
+import { useTheme } from 'next-themes'
 
 export function Form() {
+	const { theme } = useTheme()
+
 	const router = useRouter()
 	const {
 		error,
@@ -133,7 +136,7 @@ export function Form() {
 									siteKey="1x00000000000000000000AA" // Test site key (always pass)
 									options={{
 										action: 'submit-form',
-										theme: 'light',
+										theme: theme === 'dark' ? 'dark' : 'light',
 										language: 'pt',
 										size: 'flexible',
 									}}
