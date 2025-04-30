@@ -111,7 +111,7 @@ export function Form() {
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
-									<PasswordInput {...field} placeholder="********" />
+									<PasswordInput {...field} placeholder="********" className='text-base' />
 									<div className="text-right">
 										<Link
 											href="/forgot-password"
