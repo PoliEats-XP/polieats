@@ -6,7 +6,7 @@ const authRoutes = ['/login', '/register']
 const authenticatedRoutes = ['/']
 const adminRoutes = ['/dashboard']
 
-export async function authMiddleware(req: NextRequest) {
+export default async function authMiddleware(req: NextRequest) {
 	const pathName = req.nextUrl.pathname
 	const isAuthRoute = authRoutes.includes(pathName)
 	const isAuthenticatedRoute = authenticatedRoutes.includes(pathName)

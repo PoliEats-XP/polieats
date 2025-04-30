@@ -1,6 +1,4 @@
 import Image from 'next/image'
-import { Avatar, AvatarFallback } from './ui/avatar'
-import { AvatarImage } from '@radix-ui/react-avatar'
 import { ThemeSwitcher } from './theme-switcher'
 import { AvatarDropdown } from './avatar-dropdown'
 

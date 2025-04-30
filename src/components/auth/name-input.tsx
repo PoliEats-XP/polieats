@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AtSign, User } from 'lucide-react'
+import { User } from 'lucide-react'
 import { Input } from '../ui/input'
 import { cn } from '@/lib/utils'
 
