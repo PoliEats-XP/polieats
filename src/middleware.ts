@@ -32,12 +32,14 @@ export default async function authMiddleware(req: NextRequest) {
 
 	const role = session.user.role
 
+	console.log('role:', role)
+
 	if (!session && isAuthenticatedRoute) {
 		return NextResponse.redirect(new URL('/login', req.url))
 	}
 
 	if (session && role === 'admin' && isAuthenticatedRoute) {
-		return NextResponse.next()
+		return NextResponse.redirect(new URL('/dashboard', req.url))
 	}
 
 	if (session && role !== 'admin' && isAuthRoute) {
