@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AtSign, User } from 'lucide-react'
+import { User } from 'lucide-react'
 import { Input } from '../ui/input'
 import { cn } from '@/lib/utils'
 
@@ -34,7 +34,7 @@ export function NameInput({
 				value={name}
 				onChange={handleChange}
 				className={cn(
-					'px-14 py-6 lg:text-4xl placeholder:text-lg placeholder:text-[#BBBBBB] placeholder:font-light',
+					'px-14 py-6 text-base placeholder:text-lg placeholder:text-[#BBBBBB] placeholder:font-light',
 					className
 				)}
 				disabled={disabled}

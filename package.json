@@ -10,6 +10,7 @@
     "biome:lint": "npx @biomejs/biome check --write src/"
   },
   "dependencies": {
+    "@better-fetch/fetch": "^1.1.18",
     "@hookform/resolvers": "^5.0.1",
     "@marsidev/react-turnstile": "^1.1.0",
     "@prisma/client": "^6.5.0",
