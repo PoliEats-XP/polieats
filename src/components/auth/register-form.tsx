@@ -54,7 +54,7 @@ export function RegisterForm() {
 				return toast.error('As senhas não coincidem')
 			}
 
-			signUp.email(
+			await signUp.email(
 				{
 					name: values.name,
 					email: values.email,
@@ -81,7 +81,7 @@ export function RegisterForm() {
 						}, 3000)
 					},
 					onError: (error) => {
-						toast.error('Erro ao realizar login!')
+						toast.error('Erro ao realizar cadastro!')
 						setError(error.error.message)
 						setLoading(false)
 					},
@@ -90,7 +90,7 @@ export function RegisterForm() {
 		} catch (error) {
 			console.log(error)
 			setError('Something get wrong')
-			toast.error('Erro ao realizar login!')
+			toast.error('Erro ao realizar cadastro!')
 			setLoading(false)
 		}
 	}
