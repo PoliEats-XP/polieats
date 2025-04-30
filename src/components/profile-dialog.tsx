@@ -6,6 +6,7 @@ import { NameInput } from './auth/name-input'
 import { EmailInput } from './auth/email-input'
 import { PasswordInput } from './auth/password-input'
 import { Button } from './ui/button'
+import { authClient } from '@/lib/auth-client'
 
 type ProfileDialogProps = {
 	open?: boolean
@@ -13,6 +14,9 @@ type ProfileDialogProps = {
 }
 
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
+	const { data } = authClient.useSession()
+	const session = data
+
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>
 			<DialogContent className="">
@@ -20,14 +24,24 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center flex-col gap-2">
 						<Avatar className="size-36">
-							<AvatarImage src="https://github.com/gbrasil720.png" />
+							<AvatarImage
+								src={session?.user.image || 'https://github.com/gbrasil720.png'}
+							/>
 							<AvatarFallback>GB</AvatarFallback>
 						</Avatar>
 						<p>Editar</p>
 					</div>
 					<div className="flex flex-col items-center gap-5">
-						<NameInput disabled className="w-64" />
-						<EmailInput disabled className="w-64" />
+						<NameInput
+							disabled
+							className="w-64 text-[2px]"
+							value={session?.user.name || ''}
+						/>
+						<EmailInput
+							disabled
+							className="w-64"
+							value={session?.user.email || ''}
+						/>
 						<PasswordInput disabled placeholder="********" className="w-64" />
 					</div>
 				</div>

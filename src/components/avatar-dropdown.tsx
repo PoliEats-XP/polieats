@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LogOut, User } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
@@ -12,8 +12,12 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { ProfileDialog } from './profile-dialog'
+import { authClient } from '@/lib/auth-client'
 
 export function AvatarDropdown() {
+	const { data } = authClient.useSession()
+	const session = data
+
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
 
 	return (
@@ -21,7 +25,7 @@ export function AvatarDropdown() {
 			<DropdownMenu>
 				<DropdownMenuTrigger className="cursor-pointer">
 					<Avatar>
-						<AvatarImage src="https://github.com/gbrasil720.png" />
+						<AvatarImage src={session?.user.image || ''} />
 						<AvatarFallback>GB</AvatarFallback>
 					</Avatar>
 				</DropdownMenuTrigger>

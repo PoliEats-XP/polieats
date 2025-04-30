@@ -4,7 +4,7 @@ import { AvatarImage } from '@radix-ui/react-avatar'
 import { ThemeSwitcher } from './theme-switcher'
 import { AvatarDropdown } from './avatar-dropdown'
 
-export function Navbar() {
+export async function Navbar() {
 	return (
 		<div className="flex border-b items-center justify-between px-6 py-4">
 			<div className="flex items-center gap-2">
