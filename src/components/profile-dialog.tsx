@@ -2,11 +2,10 @@
 
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from './ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { NameInput } from './auth/name-input'
-import { EmailInput } from './auth/email-input'
-import { PasswordInput } from './auth/password-input'
 import { Button } from './ui/button'
 import { authClient } from '@/lib/auth-client'
+import { IconInput } from './icon-input'
+import { AtSign, KeyRound, User } from 'lucide-react'
 
 type ProfileDialogProps = {
 	open?: boolean
@@ -32,17 +31,24 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 						<p>Editar</p>
 					</div>
 					<div className="flex flex-col items-center gap-5">
-						<NameInput
+						<IconInput
+							LeftIcon={User}
 							disabled
 							className="w-64 text-[2px]"
-							value={session?.user.name || ''}
+							inputValue={session?.user.name || ''}
 						/>
-						<EmailInput
+						<IconInput
+							LeftIcon={AtSign}
+							disabled
+							className="w-64 text-[2px]"
+							inputValue={session?.user.email || ''}
+						/>
+						<IconInput
+							LeftIcon={KeyRound}
 							disabled
 							className="w-64"
-							value={session?.user.email || ''}
+							placeholder="*******"
 						/>
-						<PasswordInput disabled placeholder="********" className="w-64" />
 					</div>
 				</div>
 				<DialogFooter className="mt-16">

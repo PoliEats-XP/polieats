@@ -13,18 +13,17 @@ import {
 	FormLabel,
 	FormMessage,
 } from '../ui/form'
-import { EmailInput } from './email-input'
-import { PasswordInput } from './password-input'
 import Link from 'next/link'
 import { AuthenticateButton } from './login-button'
 import { OrLine } from './or-line'
 import { GoogleLoginButton } from './google-login-button'
-import { NameInput } from './name-input'
 import { toast } from 'sonner'
 import { signUp } from '@/lib/auth-client'
 import { useAuthState } from '@/hooks/useAuthState'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
+import { IconInput } from '../icon-input'
+import { AtSign, KeyRound, User } from 'lucide-react'
 
 export function RegisterForm() {
 	const { theme } = useTheme()
@@ -107,7 +106,7 @@ export function RegisterForm() {
 								Nome
 							</FormLabel>
 							<FormControl>
-								<NameInput {...field} placeholder="John Doe" />
+								<IconInput LeftIcon={User} placeholder="John Doe" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -122,7 +121,11 @@ export function RegisterForm() {
 								E-mail
 							</FormLabel>
 							<FormControl>
-								<EmailInput {...field} placeholder="email@email.com" />
+								<IconInput
+									LeftIcon={AtSign}
+									placeholder="email@email.com"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -138,7 +141,12 @@ export function RegisterForm() {
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
-									<PasswordInput {...field} placeholder="********" />
+									<IconInput
+										LeftIcon={KeyRound}
+										placeholder="********"
+										inputType="password"
+										{...field}
+									/>
 								</div>
 							</FormControl>
 							<FormMessage />
@@ -155,7 +163,12 @@ export function RegisterForm() {
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
-									<PasswordInput {...field} placeholder="********" />
+									<IconInput
+										LeftIcon={KeyRound}
+										placeholder="********"
+										inputType="password"
+										{...field}
+									/>
 								</div>
 							</FormControl>
 							<FormMessage />

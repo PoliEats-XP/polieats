@@ -13,8 +13,6 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import type { z } from 'zod'
 import { loginFormSchema } from '@/lib/schemas/auth.schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { EmailInput } from './email-input'
-import { PasswordInput } from './password-input'
 import { AuthenticateButton } from './login-button'
 import Link from 'next/link'
 import { OrLine } from './or-line'
@@ -24,6 +22,8 @@ import { useRouter } from 'next/navigation'
 import { useAuthState } from '@/hooks/useAuthState'
 import { signIn } from '@/lib/auth-client'
 import { useTheme } from 'next-themes'
+import { IconInput } from '../icon-input'
+import { AtSign, KeyRound } from 'lucide-react'
 
 export function Form() {
 	const { theme } = useTheme()
@@ -95,7 +95,11 @@ export function Form() {
 								E-mail
 							</FormLabel>
 							<FormControl>
-								<EmailInput {...field} placeholder="email@email.com" />
+								<IconInput
+									LeftIcon={AtSign}
+									placeholder="email@email.com"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -111,7 +115,12 @@ export function Form() {
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
-									<PasswordInput {...field} placeholder="********" className='text-base' />
+									<IconInput
+										LeftIcon={KeyRound}
+										placeholder="********"
+										inputType="password"
+										{...field}
+									/>
 									<div className="text-right">
 										<Link
 											href="/forgot-password"

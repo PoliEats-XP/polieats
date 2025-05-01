@@ -13,9 +13,8 @@ import type { z } from 'zod'
 import { addItemFormSchema } from '@/lib/schemas/menu.schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../ui/button'
-import { ItemNameInput } from './item-name-input'
-import { ItemQuantityInput } from './quantity-item-input'
-import { ItemPriceInput } from './item-price-input'
+import { IconInput } from '../icon-input'
+import { DollarSign, Hash, Pencil } from 'lucide-react'
 
 export function AddItemForm() {
 	const form = useForm<z.infer<typeof addItemFormSchema>>({
@@ -41,7 +40,12 @@ export function AddItemForm() {
 								Nome do item
 							</FormLabel>
 							<FormControl>
-								<ItemNameInput {...field} placeholder="Chiclete de menta" />
+								<IconInput
+									LeftIcon={Pencil}
+									leftIconSize={5}
+									placeholder="Chiclete de menta"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -56,10 +60,13 @@ export function AddItemForm() {
 								Quantidade inicial do item
 							</FormLabel>
 							<FormControl>
-								<ItemQuantityInput
-									{...field}
-									value={undefined}
+								<IconInput
+									LeftIcon={Hash}
 									placeholder="17"
+									{...field}
+									inputValue={undefined}
+									leftIconSize={5}
+									inputType="number"
 								/>
 							</FormControl>
 							<FormMessage />
@@ -75,7 +82,14 @@ export function AddItemForm() {
 								Preço do item
 							</FormLabel>
 							<FormControl>
-								<ItemPriceInput {...field} value={undefined} placeholder="5" />
+								<IconInput
+									LeftIcon={DollarSign}
+									placeholder="5"
+									{...field}
+									inputValue={undefined}
+									leftIconSize={5}
+									inputType="number"
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
