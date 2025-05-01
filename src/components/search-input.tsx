@@ -1,9 +1,11 @@
+'use client'
+
 import { useState } from 'react'
-import { AtSign } from 'lucide-react'
-import { Input } from '../ui/input'
+import { Search } from 'lucide-react'
+import { Input } from './ui/input'
 import { cn } from '@/lib/utils'
 
-interface EmailInputProps {
+interface SearchInputProps {
 	placeholder?: string
 	value?: string
 	onChange?: (value: string) => void
@@ -11,30 +13,30 @@ interface EmailInputProps {
 	disabled?: boolean
 }
 
-export function EmailInput({
+export function SearchInput({
 	className,
 	disabled,
 	onChange,
-	placeholder = 'email@email.com',
+	placeholder = 'Buscar item',
 	value,
-}: EmailInputProps) {
-	const [email, setEmail] = useState(value || '')
+}: SearchInputProps) {
+	const [search, setSearch] = useState(value || '')
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setEmail(event.target.value)
+		setSearch(event.target.value)
 		onChange?.(event.target.value)
 	}
 
 	return (
 		<div className="relative">
-			<AtSign className="absolute left-3 top-1/2 h-6 w-6 -translate-y-1/2 text-[#BBBBBB]" />
+			<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#BBBBBB]" />
 			<Input
-				type="email"
+				type="text"
 				placeholder={placeholder}
-				value={email}
+				value={search}
 				onChange={handleChange}
 				className={cn(
-					'px-14 py-6 text-base placeholder:text-lg placeholder:text-[#BBBBBB] placeholder:font-light',
+					'px-14 py-4 text-base placeholder:text-normal placeholder:text-[#BBBBBB] placeholder:font-light',
 					className
 				)}
 				disabled={disabled}

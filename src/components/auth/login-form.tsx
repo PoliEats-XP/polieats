@@ -13,17 +13,16 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import type { z } from 'zod'
 import { loginFormSchema } from '@/lib/schemas/auth.schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { EmailInput } from './email-input'
-import { PasswordInput } from './password-input'
-import { AuthenticateButton } from './login-button'
 import Link from 'next/link'
 import { OrLine } from './or-line'
-import { GoogleLoginButton } from './google-login-button'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useAuthState } from '@/hooks/useAuthState'
 import { signIn } from '@/lib/auth-client'
 import { useTheme } from 'next-themes'
+import { IconInput } from '../icon-input'
+import { AtSign, Chrome, KeyRound } from 'lucide-react'
+import { GradientButton } from '../gradient-button'
 
 export function Form() {
 	const { theme } = useTheme()
@@ -95,7 +94,11 @@ export function Form() {
 								E-mail
 							</FormLabel>
 							<FormControl>
-								<EmailInput {...field} placeholder="email@email.com" />
+								<IconInput
+									LeftIcon={AtSign}
+									placeholder="email@email.com"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -111,7 +114,12 @@ export function Form() {
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
-									<PasswordInput {...field} placeholder="********" className='text-base' />
+									<IconInput
+										LeftIcon={KeyRound}
+										placeholder="********"
+										inputType="password"
+										{...field}
+									/>
 									<div className="text-right">
 										<Link
 											href="/forgot-password"
@@ -146,14 +154,16 @@ export function Form() {
 						</FormItem>
 					)}
 				/>
-				<AuthenticateButton
+				<GradientButton
+					variant="filled"
+					className="-mt-3"
 					loading={loading}
 					disabled={form.formState.isSubmitting}
 				>
 					Entrar
-				</AuthenticateButton>
+				</GradientButton>
 				<OrLine />
-				<GoogleLoginButton />
+				<GradientButton variant="google" className="flex items-center gap-2" />
 				<div className="text-center -mt-7">
 					<Link
 						href="/register"
