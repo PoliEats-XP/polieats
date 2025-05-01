@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Ubuntu } from 'next/font/google'
 import './globals.css'
-import { Toaster } from 'sonner'
 import { ThemeProvider } from '@/components/theme-provider'
+import { ClientToaster } from '@/components/client-toaster'
 
 const ubuntu = Ubuntu({
 	weight: ['300', '400', '500'],
@@ -31,7 +31,7 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<main>{children}</main>
-					<Toaster />
+					<ClientToaster />
 				</ThemeProvider>
 			</body>
 		</html>

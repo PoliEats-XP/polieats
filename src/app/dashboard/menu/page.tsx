@@ -1,10 +1,16 @@
+'use client'
+
+import { AddItemDialog } from '@/components/item/add-item-dialog'
 import { Item } from '@/components/item'
 import { Navbar } from '@/components/navbar'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
+import { useState } from 'react'
 
 export default function Dashboard() {
+	const [open, onOpenChange] = useState(false)
+
 	return (
 		<>
 			<Navbar variant="admin" activeLink="menu" />
@@ -15,9 +21,11 @@ export default function Dashboard() {
 					<Button
 						variant="outline"
 						className="flex items-center text-normal py-1 cursor-pointer"
+						onClick={() => onOpenChange(true)}
 					>
 						<Plus className="size-4 mr-1" /> Adicionar item ao menu
 					</Button>
+					<AddItemDialog open={open} onOpenChange={onOpenChange} />
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
