@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../ui/button'
 import { IconInput } from '../icon-input'
 import { DollarSign, Hash, Pencil } from 'lucide-react'
+import { GradientButton } from '../gradient-button'
 
 export function AddItemForm() {
 	const form = useForm<z.infer<typeof addItemFormSchema>>({
@@ -96,13 +97,12 @@ export function AddItemForm() {
 					)}
 				/>
 				<div className="flex items-center justify-between">
-					<Button
-						type="submit"
-						// disabled={disabled || loading}
-						className="rounded-sm w-40 text-white bg-gradient-to-r text-base from-[#ED2152] from-0% to-[#C71585] to-80% font-normal py-5 cursor-pointer hover:opacity-80 transition-opacity duration-200 ease-in-out"
+					<GradientButton
+						variant="filled"
+						className="rounded-sm w-40 text-base"
 					>
 						Adicionar item
-					</Button>
+					</GradientButton>
 					<Button
 						variant="outline"
 						className="rounded-sm w-24 cursor-pointer text-base"

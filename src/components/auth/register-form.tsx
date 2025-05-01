@@ -14,9 +14,7 @@ import {
 	FormMessage,
 } from '../ui/form'
 import Link from 'next/link'
-import { AuthenticateButton } from './login-button'
 import { OrLine } from './or-line'
-import { GoogleLoginButton } from './google-login-button'
 import { toast } from 'sonner'
 import { signUp } from '@/lib/auth-client'
 import { useAuthState } from '@/hooks/useAuthState'
@@ -24,6 +22,7 @@ import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { IconInput } from '../icon-input'
 import { AtSign, KeyRound, User } from 'lucide-react'
+import { GradientButton } from '../gradient-button'
 
 export function RegisterForm() {
 	const { theme } = useTheme()
@@ -195,14 +194,16 @@ export function RegisterForm() {
 						</FormItem>
 					)}
 				/>
-				<AuthenticateButton
+				<GradientButton
+					variant="filled"
+					className="-mt-3"
 					loading={loading}
 					disabled={form.formState.isSubmitting}
 				>
-					Criar conta
-				</AuthenticateButton>
+					Entrar
+				</GradientButton>
 				<OrLine />
-				<GoogleLoginButton />
+				<GradientButton variant="google" className="flex items-center gap-2" />
 				<div className="text-center -mt-7">
 					<Link
 						href="/login"
