@@ -1,7 +1,7 @@
 'use client'
 
 import { AddItemDialog } from '@/components/item/add-item-dialog'
-import { Item } from '@/components/item'
+import { Item } from '@/components/item/item'
 import { Navbar } from '@/components/navbar'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'

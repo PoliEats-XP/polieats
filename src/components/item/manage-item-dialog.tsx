@@ -1,4 +1,4 @@
-import type { itemFormSchema } from '@/lib/schemas/menu.schemas'
+import type { z } from 'zod'
 import {
 	Dialog,
 	DialogContent,
@@ -7,14 +7,23 @@ import {
 	DialogTitle,
 } from '../ui/dialog'
 import { ItemForm } from './add-item-form'
-import type { z } from 'zod'
+import type { itemFormSchema } from '@/lib/schemas/menu.schemas'
 
-type AddItemDialogProps = {
+type ManageItemDialogProps = {
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
+	item_name: string
+	item_price: number
+	item_available_quantity: number
 }
 
-export function AddItemDialog({ onOpenChange, open }: AddItemDialogProps) {
+export function MangeItemDialog({
+	onOpenChange,
+	open,
+	item_available_quantity,
+	item_name,
+	item_price,
+}: ManageItemDialogProps) {
 	async function onSubmit(values: z.infer<typeof itemFormSchema>) {}
 
 	return (
@@ -22,13 +31,19 @@ export function AddItemDialog({ onOpenChange, open }: AddItemDialogProps) {
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle className="text-2xl font-medium">
-						Adicionar item
+						{item_name}
 					</DialogTitle>
 					<DialogDescription className="text-lg font-light">
-						Adicione um novo item ao cardápio
+						Alguns detalhes sobre este item
 					</DialogDescription>
 				</DialogHeader>
-				<ItemForm onSubmit={onSubmit} onOpenChange={onOpenChange} />
+				<ItemForm
+					onSubmit={onSubmit}
+					item_price={item_price}
+					item_name={item_name}
+					item_available_quantity={item_available_quantity}
+					onOpenChange={onOpenChange}
+				/>
 			</DialogContent>
 		</Dialog>
 	)

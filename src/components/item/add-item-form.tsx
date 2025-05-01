@@ -10,24 +10,36 @@ import {
 	FormMessage,
 } from '../ui/form'
 import type { z } from 'zod'
-import { addItemFormSchema } from '@/lib/schemas/menu.schemas'
+import { itemFormSchema } from '@/lib/schemas/menu.schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../ui/button'
 import { IconInput } from '../icon-input'
 import { DollarSign, Hash, Pencil } from 'lucide-react'
 import { GradientButton } from '../gradient-button'
 
-export function AddItemForm() {
-	const form = useForm<z.infer<typeof addItemFormSchema>>({
-		resolver: zodResolver(addItemFormSchema),
+interface ItemFormProps {
+	onSubmit: (values: z.infer<typeof itemFormSchema>) => void
+	item_name?: string
+	item_price?: number
+	item_available_quantity?: number
+	onOpenChange?: (open: boolean) => void
+}
+
+export function ItemForm({
+	onSubmit,
+	item_available_quantity,
+	item_name,
+	item_price,
+	onOpenChange,
+}: ItemFormProps) {
+	const form = useForm<z.infer<typeof itemFormSchema>>({
+		resolver: zodResolver(itemFormSchema),
 		defaultValues: {
 			name: '',
 			initial_available_quantity: 0,
 			price: 0,
 		},
 	})
-
-	async function onSubmit(values: z.infer<typeof addItemFormSchema>) {}
 
 	return (
 		<FormComponent {...form}>
@@ -45,6 +57,7 @@ export function AddItemForm() {
 									LeftIcon={Pencil}
 									leftIconSize={5}
 									placeholder="Chiclete de menta"
+									inputValue={item_name}
 									{...field}
 								/>
 							</FormControl>
@@ -65,7 +78,7 @@ export function AddItemForm() {
 									LeftIcon={Hash}
 									placeholder="17"
 									{...field}
-									inputValue={undefined}
+									inputValue={item_available_quantity || undefined}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -87,7 +100,7 @@ export function AddItemForm() {
 									LeftIcon={DollarSign}
 									placeholder="5"
 									{...field}
-									inputValue={undefined}
+									inputValue={item_price || undefined}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -101,11 +114,13 @@ export function AddItemForm() {
 						variant="filled"
 						className="rounded-sm w-40 text-base"
 					>
-						Adicionar item
+						Excluir item
 					</GradientButton>
 					<Button
 						variant="outline"
 						className="rounded-sm w-24 cursor-pointer text-base"
+						onClick={() => onOpenChange?.(false)}
+						type="button"
 					>
 						Fechar
 					</Button>

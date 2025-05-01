@@ -10,7 +10,7 @@ interface IconProps {
 
 interface IconInputProps {
 	placeholder?: string
-	inputValue?: string
+	inputValue?: string | number
 	onChange?: (value: string) => void
 	className?: string
 	disabled?: boolean

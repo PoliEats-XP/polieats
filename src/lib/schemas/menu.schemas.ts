@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const addItemFormSchema = z.object({
+export const itemFormSchema = z.object({
 	name: z.string().min(3, { message: 'Nome deve ter pelo menos 3 caracteres' }),
 	initial_available_quantity: z.number().min(1, {
 		message: 'Quantidade inicial deve ser maior que 0',
