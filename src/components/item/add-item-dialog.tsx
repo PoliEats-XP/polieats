@@ -8,14 +8,68 @@ import {
 } from '../ui/dialog'
 import { ItemForm } from './add-item-form'
 import type { z } from 'zod'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { nanoid } from 'nanoid'
+import { addMenuItem } from '@/utils/add-menu-item'
 
 type AddItemDialogProps = {
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
 }
 
+type MenuItem = z.infer<typeof itemFormSchema>
+
 export function AddItemDialog({ onOpenChange, open }: AddItemDialogProps) {
-	async function onSubmit(values: z.infer<typeof itemFormSchema>) {}
+	const queryClient = useQueryClient()
+
+	const addMutation = useMutation({
+		mutationFn: addMenuItem,
+		onMutate: async (newItem: MenuItem) => {
+			console.log('Optimistic update: Adding item', newItem)
+			// Cancel any outgoing refetches
+			await queryClient.cancelQueries({ queryKey: ['menu'] })
+
+			// Snapshot the previous value
+			const previousMenu = queryClient.getQueryData(['menu'])
+
+			// Optimistically update the menu
+			queryClient.setQueryData(['menu'], (old: MenuItem[] | undefined) => {
+				const tempId = nanoid()
+				const updatedMenu = [...(old || []), { ...newItem, id: tempId }]
+				console.log('Updated menu:', updatedMenu)
+				return updatedMenu
+			})
+
+			// Close the dialog
+			onOpenChange?.(false)
+
+			// Return context with the previous menu
+			return { previousMenu }
+		},
+		onError: (err, newItem, context) => {
+			console.error('Mutation error:', err)
+			// Roll back to the previous menu on error
+			queryClient.setQueryData(['menu'], context?.previousMenu)
+		},
+		onSuccess: (data) => {
+			console.log('Mutation success:', data)
+		},
+		onSettled: () => {
+			console.log('Invalidating menu query')
+			// Invalidate to refetch the menu
+			queryClient.invalidateQueries({ queryKey: ['menu'] })
+		},
+	})
+
+	// on item add
+	async function onSubmitInclude(values: z.infer<typeof itemFormSchema>) {
+		console.log(values)
+
+		addMutation.mutate(values)
+	}
+
+	// on item delete
+	async function onSubmitDelete(values: z.infer<typeof itemFormSchema>) {}
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>
@@ -28,7 +82,11 @@ export function AddItemDialog({ onOpenChange, open }: AddItemDialogProps) {
 						Adicione um novo item ao cardápio
 					</DialogDescription>
 				</DialogHeader>
-				<ItemForm onSubmit={onSubmit} onOpenChange={onOpenChange} />
+				<ItemForm
+					onSubmitDelete={onSubmitDelete}
+					onSubmitInclude={onSubmitInclude}
+					onOpenChange={onOpenChange}
+				/>
 			</DialogContent>
 		</Dialog>
 	)

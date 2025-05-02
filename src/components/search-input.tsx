@@ -18,7 +18,6 @@ interface SearchInputProps {
 	className?: string
 	disabled?: boolean
 	items: ItemProps[]
-	onSearch: (filteredItems: ItemProps[]) => void
 }
 
 export function SearchInput({
@@ -26,7 +25,6 @@ export function SearchInput({
 	disabled,
 	items = [],
 	placeholder = 'Buscar item',
-	onSearch,
 }: SearchInputProps) {
 	const [search, setSearch] = useQueryState(
 		'search',
@@ -41,17 +39,11 @@ export function SearchInput({
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const query = event.target.value
 		setSearch(query)
-
-		const filtered = items.filter((item) =>
-			item.name.toLowerCase().includes(query.toLowerCase())
-		)
-		onSearch(filtered)
 	}
 
 	const handleSelect = (item: ItemProps) => {
 		setSearch(item.name)
 		setIsFocused(false)
-		onSearch([item])
 	}
 
 	return (

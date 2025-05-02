@@ -8,13 +8,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-	const { name, price, quantity } = await req.json()
+	const { name, price, initial_available_quantity } = await req.json()
 
 	await prisma.item.create({
 		data: {
 			name,
-			price,
-			quantity,
+			price: Number.parseFloat(price),
+			quantity: Number.parseInt(initial_available_quantity),
 		},
 	})
 

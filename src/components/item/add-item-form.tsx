@@ -18,7 +18,8 @@ import { DollarSign, Hash, Pencil } from 'lucide-react'
 import { GradientButton } from '../gradient-button'
 
 interface ItemFormProps {
-	onSubmit: (values: z.infer<typeof itemFormSchema>) => void
+	onSubmitInclude: (values: z.infer<typeof itemFormSchema>) => void
+	onSubmitDelete: (values: z.infer<typeof itemFormSchema>) => void
 	item_name?: string
 	item_price?: number
 	item_available_quantity?: number
@@ -26,7 +27,8 @@ interface ItemFormProps {
 }
 
 export function ItemForm({
-	onSubmit,
+	onSubmitInclude,
+	onSubmitDelete,
 	item_available_quantity,
 	item_name,
 	item_price,
@@ -43,7 +45,14 @@ export function ItemForm({
 
 	return (
 		<FormComponent {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+			<form
+				onSubmit={
+					item_name
+						? form.handleSubmit(onSubmitDelete)
+						: form.handleSubmit(onSubmitInclude)
+				}
+				className="space-y-8"
+			>
 				<FormField
 					control={form.control}
 					name="name"
@@ -78,7 +87,9 @@ export function ItemForm({
 									LeftIcon={Hash}
 									placeholder="17"
 									{...field}
-									inputValue={item_available_quantity || undefined}
+									inputValue={
+										Number(item_available_quantity) || Number(field.value)
+									}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -100,7 +111,10 @@ export function ItemForm({
 									LeftIcon={DollarSign}
 									placeholder="5"
 									{...field}
-									inputValue={item_price || undefined}
+									inputValue={
+										Number(item_price) ||
+										Number.parseInt(field.value.toString())
+									}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -114,7 +128,7 @@ export function ItemForm({
 						variant="filled"
 						className="rounded-sm w-40 text-base"
 					>
-						Excluir item
+						{item_name ? 'Excluir item' : 'Adicionar item'}
 					</GradientButton>
 					<Button
 						variant="outline"

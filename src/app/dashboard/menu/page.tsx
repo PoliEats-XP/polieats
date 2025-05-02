@@ -5,10 +5,12 @@ import { Item } from '@/components/item/item'
 import { Navbar } from '@/components/navbar'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
+import { fetchMenu } from '@/utils/fetch-menu'
 import { betterFetch } from '@better-fetch/fetch'
+import { useQuery } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 interface ItemProps {
 	id: string
@@ -19,38 +21,28 @@ interface ItemProps {
 
 export default function Dashboard() {
 	const [open, onOpenChange] = useState(false)
-	const [items, setItems] = useState<ItemProps[]>([])
-	const [filteredItems, setFilteredItems] = useState<ItemProps[]>([])
+	// const [items, setItems] = useState<ItemProps[]>([])
+	// const [filteredItems, setFilteredItems] = useState<ItemProps[]>([])
 	const [search] = useQueryState('search', parseAsString.withDefault(''))
 
-	useEffect(() => {
-		async function fetchData() {
-			const { data: itemsData } = await betterFetch<{ items: ItemProps[] }>(
-				'/api/menu/items',
-				{
-					headers: { cookie: document.cookie },
-					method: 'GET',
-				}
-			)
+	const {
+		data: items = [],
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: ['menu'],
+		queryFn: fetchMenu,
+	})
 
-			console.log(itemsData?.items)
-			const fetchedItems = itemsData?.items || []
-			setItems(fetchedItems)
+	const filteredItems = useMemo(() => {
+		return search
+			? items.filter((item) =>
+					item.name.toLowerCase().includes(search.toLowerCase())
+				)
+			: items
+	}, [items, search])
 
-			const filtered = search
-				? fetchedItems.filter((item) =>
-						item.name.toLowerCase().includes(search.toLowerCase())
-					)
-				: fetchedItems
-			setFilteredItems(filtered)
-		}
-
-		fetchData()
-	}, [])
-
-	const handleSearch = (filtered: ItemProps[]) => {
-		setFilteredItems(filtered)
-	}
+	const handleSearch = (filtered: ItemProps[]) => {}
 
 	return (
 		<>
@@ -58,7 +50,7 @@ export default function Dashboard() {
 
 			<div className="max-w-7xl mx-auto p-6 mt-12">
 				<div className="flex justify-between items-center mb-3">
-					<SearchInput items={items} onSearch={handleSearch} />
+					<SearchInput items={items} />
 					<Button
 						variant="outline"
 						className="flex items-center text-normal py-1 cursor-pointer"
@@ -81,7 +73,7 @@ export default function Dashboard() {
 							/>
 						))
 					) : (
-						<h1>Nenhum item encontrado...</h1>
+						<h1>Nenhum item encontrado...</h1> // TODO: Add a nice empty state here
 					)}
 				</div>
 			</div>
