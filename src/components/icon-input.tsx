@@ -11,7 +11,7 @@ interface IconProps {
 interface IconInputProps {
 	placeholder?: string
 	inputValue?: string | number
-	onChange?: (value: string | number) => void
+	onChange?: (value: string | number | any) => void
 	className?: string
 	disabled?: boolean
 	inputType?: React.HTMLInputTypeAttribute

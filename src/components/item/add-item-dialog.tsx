@@ -1,3 +1,5 @@
+'use client'
+
 import type { itemFormSchema } from '@/lib/schemas/menu.schemas'
 import {
 	Dialog,
@@ -11,10 +13,18 @@ import type { z } from 'zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
 import { addMenuItem } from '@/utils/add-menu-item'
+import { deleteMenuItem } from '@/utils/delete-menu-item'
 
 type AddItemDialogProps = {
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
+}
+
+interface ItemProps {
+	id: string
+	name: string
+	quantity: number
+	price: number
 }
 
 type MenuItem = z.infer<typeof itemFormSchema>
@@ -68,8 +78,42 @@ export function AddItemDialog({ onOpenChange, open }: AddItemDialogProps) {
 		addMutation.mutate(values)
 	}
 
+	const deleteMutation = useMutation({
+		mutationFn: deleteMenuItem,
+		onMutate: async (id: string) => {
+			console.log('Optimistic update: Deleting item with id', id)
+			await queryClient.cancelQueries({ queryKey: ['menu'] })
+			const previousMenu = queryClient.getQueryData(['menu'])
+			queryClient.setQueryData(['menu'], (old: ItemProps[] | undefined) => {
+				const updatedMenu = (old || []).filter((item) => item.id !== id)
+				console.log('Updated menu (delete):', updatedMenu)
+				return updatedMenu
+			})
+			onOpenChange?.(false)
+			return { previousMenu }
+		},
+		onError: (err, id, context) => {
+			console.error('Delete mutation error:', err)
+			queryClient.setQueryData(['menu'], context?.previousMenu)
+		},
+		onSuccess: (data) => {
+			console.log('Delete mutation success:', data)
+		},
+		onSettled: () => {
+			console.log('Invalidating menu query (delete)')
+			queryClient.invalidateQueries({ queryKey: ['menu'] })
+		},
+	})
+
 	// on item delete
-	async function onSubmitDelete(values: z.infer<typeof itemFormSchema>) {}
+	async function onSubmitDelete(values: z.infer<typeof itemFormSchema>) {
+		console.log('Submitting item for delete:', values)
+		if (!values.id) {
+			console.error('No ID provided for deletion')
+			return
+		}
+		deleteMutation.mutate(values.id)
+	}
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>

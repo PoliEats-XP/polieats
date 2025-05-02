@@ -23,3 +23,18 @@ export async function POST(req: NextRequest) {
 		{ status: 201 }
 	)
 }
+
+export async function DELETE(req: NextRequest) {
+	const { id } = await req.json()
+
+	await prisma.item.delete({
+		where: {
+			id,
+		},
+	})
+
+	return NextResponse.json(
+		{ message: 'Item deleted successfully' },
+		{ status: 200 }
+	)
+}

@@ -34,23 +34,24 @@ export function ItemForm({
 	item_price,
 	onOpenChange,
 }: ItemFormProps) {
+	const isEditing = !!item_name
+
 	const form = useForm<z.infer<typeof itemFormSchema>>({
 		resolver: zodResolver(itemFormSchema),
 		defaultValues: {
-			name: '',
-			initial_available_quantity: 0,
-			price: 0,
+			id: undefined,
+			name: item_name || '',
+			initial_available_quantity: item_available_quantity || 0,
+			price: item_price || 0,
 		},
 	})
 
 	return (
 		<FormComponent {...form}>
 			<form
-				onSubmit={
-					item_name
-						? form.handleSubmit(onSubmitDelete)
-						: form.handleSubmit(onSubmitInclude)
-				}
+				onSubmit={form.handleSubmit(
+					isEditing ? onSubmitDelete : onSubmitInclude
+				)}
 				className="space-y-8"
 			>
 				<FormField
@@ -66,7 +67,8 @@ export function ItemForm({
 									LeftIcon={Pencil}
 									leftIconSize={5}
 									placeholder="Chiclete de menta"
-									inputValue={item_name}
+									inputValue={field.value}
+									// inputValue={item_name || field.value}
 									{...field}
 								/>
 							</FormControl>
@@ -88,8 +90,10 @@ export function ItemForm({
 									placeholder="17"
 									{...field}
 									inputValue={
-										Number(item_available_quantity) || Number(field.value)
+										// Number(item_available_quantity) || Number(field.value)
+										field.value
 									}
+									onChange={(e) => field.onChange(Number(e.target.value))}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -112,9 +116,11 @@ export function ItemForm({
 									placeholder="5"
 									{...field}
 									inputValue={
-										Number(item_price) ||
-										Number.parseInt(field.value.toString())
+										// Number(item_price) ||
+										// Number.parseInt(field.value.toString())
+										field.value
 									}
+									onChange={(e) => field.onChange(Number(e.target.value))}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -128,7 +134,7 @@ export function ItemForm({
 						variant="filled"
 						className="rounded-sm w-40 text-base"
 					>
-						{item_name ? 'Excluir item' : 'Adicionar item'}
+						{isEditing ? 'Excluir item' : 'Adicionar item'}
 					</GradientButton>
 					<Button
 						variant="outline"
