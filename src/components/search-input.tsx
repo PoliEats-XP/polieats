@@ -4,27 +4,54 @@ import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from './ui/input'
 import { cn } from '@/lib/utils'
+import { parseAsString, useQueryState } from 'nuqs'
+
+interface ItemProps {
+	id: string
+	name: string
+	quantity: number
+	price: number
+}
 
 interface SearchInputProps {
 	placeholder?: string
-	value?: string
-	onChange?: (value: string) => void
 	className?: string
 	disabled?: boolean
+	items: ItemProps[]
+	onSearch: (filteredItems: ItemProps[]) => void
 }
 
 export function SearchInput({
 	className,
 	disabled,
-	onChange,
+	items = [],
 	placeholder = 'Buscar item',
-	value,
+	onSearch,
 }: SearchInputProps) {
-	const [search, setSearch] = useState(value || '')
+	const [search, setSearch] = useQueryState(
+		'search',
+		parseAsString.withDefault('')
+	)
+	const [isFocused, setIsFocused] = useState(false)
+
+	const filteredItems = items.filter((item) =>
+		item.name.toLowerCase().includes(search.toLowerCase())
+	)
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setSearch(event.target.value)
-		onChange?.(event.target.value)
+		const query = event.target.value
+		setSearch(query)
+
+		const filtered = items.filter((item) =>
+			item.name.toLowerCase().includes(query.toLowerCase())
+		)
+		onSearch(filtered)
+	}
+
+	const handleSelect = (item: ItemProps) => {
+		setSearch(item.name)
+		setIsFocused(false)
+		onSearch([item])
 	}
 
 	return (
@@ -35,12 +62,35 @@ export function SearchInput({
 				placeholder={placeholder}
 				value={search}
 				onChange={handleChange}
+				onFocus={() => setIsFocused(true)}
+				onBlur={() => setTimeout(() => setIsFocused(false), 200)}
 				className={cn(
 					'px-14 py-4 text-base placeholder:text-normal placeholder:text-[#BBBBBB] placeholder:font-light',
 					className
 				)}
 				disabled={disabled}
 			/>
+
+			{isFocused && search && filteredItems.length > 0 && (
+				<div className="absolute z-10 mt-2 w-full rounded-md border border-gray-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+					{filteredItems.map((item) => (
+						// biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+						<div
+							key={item.id}
+							className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+							onClick={() => handleSelect(item)}
+						>
+							{item.name} - R${item.price}
+						</div>
+					))}
+				</div>
+			)}
+
+			{isFocused && search && filteredItems.length === 0 && (
+				<div className="absolute z-10 mt-2 w-full rounded-md border border-gray-200 bg-white shadow-lg px-4 py-2">
+					Nenhum item encontrado
+				</div>
+			)}
 		</div>
 	)
 }

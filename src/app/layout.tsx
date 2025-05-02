@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Ubuntu } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -30,7 +31,7 @@ export default function RootLayout({
 					defaultTheme="light"
 					disableTransitionOnChange
 				>
-					<main>{children}</main>
+					<NuqsAdapter>{children}</NuqsAdapter>
 					<ClientToaster />
 				</ThemeProvider>
 			</body>
