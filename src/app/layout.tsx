@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Ubuntu } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ClientToaster } from '@/components/client-toaster'
+import { ClientQueryProvider } from '@/components/query-client-provider'
 
 const ubuntu = Ubuntu({
 	weight: ['300', '400', '500'],
@@ -25,14 +27,16 @@ export default function RootLayout({
 				className={`${ubuntu.className} antialiased`}
 				suppressHydrationWarning
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="light"
-					disableTransitionOnChange
-				>
-					<main>{children}</main>
-					<ClientToaster />
-				</ThemeProvider>
+				<ClientQueryProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="light"
+						disableTransitionOnChange
+					>
+						<NuqsAdapter>{children}</NuqsAdapter>
+						<ClientToaster />
+					</ThemeProvider>
+				</ClientQueryProvider>
 			</body>
 		</html>
 	)

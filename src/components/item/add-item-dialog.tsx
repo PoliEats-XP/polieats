@@ -1,3 +1,5 @@
+'use client'
+
 import type { itemFormSchema } from '@/lib/schemas/menu.schemas'
 import {
 	Dialog,
@@ -8,6 +10,9 @@ import {
 } from '../ui/dialog'
 import { ItemForm } from './add-item-form'
 import type { z } from 'zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { addItemMutation, deleteItemMutation } from '@/utils/mutations'
+import { useStore } from '@/utils/store'
 
 type AddItemDialogProps = {
 	open?: boolean
@@ -15,7 +20,27 @@ type AddItemDialogProps = {
 }
 
 export function AddItemDialog({ onOpenChange, open }: AddItemDialogProps) {
-	async function onSubmit(values: z.infer<typeof itemFormSchema>) {}
+	const queryClient = useQueryClient()
+	const isEditing = useStore((state) => state.isEditing)
+
+	const { addMutation } = addItemMutation(queryClient, onOpenChange)
+	const { deleteMutation } = deleteItemMutation(queryClient, onOpenChange)
+
+	async function onSubmitInclude(values: z.infer<typeof itemFormSchema>) {
+		return addMutation.mutate(values)
+	}
+
+	async function onSubmitDelete(values: z.infer<typeof itemFormSchema>) {
+		if (!values.id) {
+			return
+		}
+
+		return deleteMutation.mutate(values.id)
+	}
+
+	async function onSubmit(values: z.infer<typeof itemFormSchema>) {
+		return isEditing ? onSubmitDelete(values) : onSubmitInclude(values)
+	}
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>

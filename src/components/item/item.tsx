@@ -23,9 +23,7 @@ export function Item({ id, name, available_quantity, price }: ItemProps) {
 					<p className="text-[#7d7d7d] mt-2 font-light">
 						Quantidade disponível: {available_quantity}
 					</p>
-					<p className=" text-[#7d7d7d] font-light">
-						Preço: R$ {price.toFixed(2)}
-					</p>
+					<p className=" text-[#7d7d7d] font-light">Preço: R$ {price}</p>
 				</CardContent>
 				<CardFooter className="p-2 pt-0 -mb-4 justify-end">
 					<Button
@@ -38,6 +36,7 @@ export function Item({ id, name, available_quantity, price }: ItemProps) {
 				</CardFooter>
 			</Card>
 			<MangeItemDialog
+				item_id={id}
 				open={open}
 				onOpenChange={onOpenChange}
 				item_available_quantity={available_quantity}

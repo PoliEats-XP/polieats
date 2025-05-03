@@ -108,10 +108,11 @@ model OrderItem {
 }
 
 model Item {
-  id     String      @id @default(uuid())
-  name   String      @unique
-  price  Decimal
-  orders OrderItem[]
+  id       String      @id @default(uuid())
+  name     String      @unique
+  price    Decimal
+  quantity Int
+  orders   OrderItem[]
 
   @@map("item")
 }

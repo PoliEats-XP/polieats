@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type ChangeEvent, useState } from 'react'
 import { Input } from './ui/input'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
@@ -11,7 +11,7 @@ interface IconProps {
 interface IconInputProps {
 	placeholder?: string
 	inputValue?: string | number
-	onChange?: (value: string) => void
+	onChange?: (value: ChangeEvent<HTMLInputElement> | number | string) => void
 	className?: string
 	disabled?: boolean
 	inputType?: React.HTMLInputTypeAttribute
@@ -33,8 +33,17 @@ export function IconInput({
 	const [showPassword, setShowPassword] = useState(false)
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setValue(event.target.value)
-		onChange?.(event.target.value)
+		if (inputType === 'number') {
+			const num = event.target.valueAsNumber
+			if (Number.isNaN(num)) return
+
+			setValue(num)
+			onChange?.(num)
+		}
+
+		const text = event.target.value
+		setValue(text)
+		onChange?.(text)
 	}
 
 	const togglePasswordVisibility = () => {
