@@ -12,6 +12,7 @@ import type { itemFormSchema } from '@/lib/schemas/menu.schemas'
 type ManageItemDialogProps = {
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
+	item_id: string
 	item_name: string
 	item_price: number
 	item_available_quantity: number
@@ -20,6 +21,7 @@ type ManageItemDialogProps = {
 export function MangeItemDialog({
 	onOpenChange,
 	open,
+	item_id,
 	item_available_quantity,
 	item_name,
 	item_price,
@@ -39,6 +41,7 @@ export function MangeItemDialog({
 				</DialogHeader>
 				<ItemForm
 					onSubmit={onSubmit}
+					id={item_id}
 					item_price={item_price}
 					item_name={item_name}
 					item_available_quantity={item_available_quantity}

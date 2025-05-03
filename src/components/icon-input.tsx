@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type ChangeEvent, useState } from 'react'
 import { Input } from './ui/input'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
@@ -11,7 +11,7 @@ interface IconProps {
 interface IconInputProps {
 	placeholder?: string
 	inputValue?: string | number
-	onChange?: (value: string | number | any) => void
+	onChange?: (value: ChangeEvent<HTMLInputElement> | number | string) => void
 	className?: string
 	disabled?: boolean
 	inputType?: React.HTMLInputTypeAttribute

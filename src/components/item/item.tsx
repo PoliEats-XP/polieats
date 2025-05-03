@@ -36,6 +36,7 @@ export function Item({ id, name, available_quantity, price }: ItemProps) {
 				</CardFooter>
 			</Card>
 			<MangeItemDialog
+				item_id={id}
 				open={open}
 				onOpenChange={onOpenChange}
 				item_available_quantity={available_quantity}

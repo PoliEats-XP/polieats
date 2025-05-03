@@ -16,10 +16,14 @@ import { Button } from '../ui/button'
 import { IconInput } from '../icon-input'
 import { DollarSign, Hash, Pencil } from 'lucide-react'
 import { GradientButton } from '../gradient-button'
+import { useEffect } from 'react'
+import { useStore } from '@/utils/store'
+import { deleteItemMutation } from '@/utils/mutations'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface ItemFormProps {
-	onSubmitInclude: (values: z.infer<typeof itemFormSchema>) => void
-	onSubmitDelete: (values: z.infer<typeof itemFormSchema>) => void
+	id?: string
+	onSubmit: (values: z.infer<typeof itemFormSchema>) => void
 	item_name?: string
 	item_price?: number
 	item_available_quantity?: number
@@ -27,33 +31,45 @@ interface ItemFormProps {
 }
 
 export function ItemForm({
-	onSubmitInclude,
-	onSubmitDelete,
+	id,
+	onSubmit,
 	item_available_quantity,
 	item_name,
 	item_price,
 	onOpenChange,
 }: ItemFormProps) {
-	const isEditing = !!item_name
+	const queryClient = useQueryClient()
+
+	const isEditing = useStore((state) => state.isEditing)
+	const setIsEditing = useStore((state) => state.setIsEditing)
+
+	useEffect(() => {
+		setIsEditing(!!item_name)
+	}, [item_name])
 
 	const form = useForm<z.infer<typeof itemFormSchema>>({
 		resolver: zodResolver(itemFormSchema),
 		defaultValues: {
-			id: undefined,
+			id: id || undefined,
 			name: item_name || '',
 			initial_available_quantity: item_available_quantity || 0,
 			price: item_price || 0,
 		},
 	})
 
+	const { deleteMutation } = deleteItemMutation(queryClient, onOpenChange)
+
+	async function onSubmitDelete(values: z.infer<typeof itemFormSchema>) {
+		if (!values.id) {
+			return
+		}
+
+		return deleteMutation.mutate(values.id)
+	}
+
 	return (
 		<FormComponent {...form}>
-			<form
-				onSubmit={form.handleSubmit(
-					isEditing ? onSubmitDelete : onSubmitInclude
-				)}
-				className="space-y-8"
-			>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 				<FormField
 					control={form.control}
 					name="name"
@@ -68,7 +84,6 @@ export function ItemForm({
 									leftIconSize={5}
 									placeholder="Chiclete de menta"
 									inputValue={field.value}
-									// inputValue={item_name || field.value}
 									{...field}
 								/>
 							</FormControl>
@@ -89,11 +104,8 @@ export function ItemForm({
 									LeftIcon={Hash}
 									placeholder="17"
 									{...field}
-									inputValue={
-										// Number(item_available_quantity) || Number(field.value)
-										field.value
-									}
-									onChange={(e) => field.onChange(Number(e.target.value))}
+									inputValue={field.value}
+									onChange={(e) => field.onChange(Number(e))}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -115,12 +127,8 @@ export function ItemForm({
 									LeftIcon={DollarSign}
 									placeholder="5"
 									{...field}
-									inputValue={
-										// Number(item_price) ||
-										// Number.parseInt(field.value.toString())
-										field.value
-									}
-									onChange={(e) => field.onChange(Number(e.target.value))}
+									inputValue={field.value}
+									onChange={(e) => field.onChange(Number(e))}
 									leftIconSize={5}
 									inputType="number"
 								/>
@@ -133,6 +141,11 @@ export function ItemForm({
 					<GradientButton
 						variant="filled"
 						className="rounded-sm w-40 text-base"
+						onClick={
+							isEditing
+								? () => onSubmitDelete(form.getValues())
+								: form.handleSubmit(onSubmit)
+						}
 					>
 						{isEditing ? 'Excluir item' : 'Adicionar item'}
 					</GradientButton>
