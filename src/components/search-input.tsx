@@ -57,7 +57,7 @@ export function SearchInput({
 				onFocus={() => setIsFocused(true)}
 				onBlur={() => setTimeout(() => setIsFocused(false), 200)}
 				className={cn(
-					'px-14 py-4 text-base placeholder:text-normal placeholder:text-[#BBBBBB] placeholder:font-light',
+					'px-14 py-4 text-base placeholder:text-normal placeholder:text-[#BBBBBB] placeholder:font-light disabled:cursor-not-allowed hover:cursor-not-allowed',
 					className
 				)}
 				disabled={disabled}

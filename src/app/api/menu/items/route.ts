@@ -28,8 +28,6 @@ export async function DELETE(req: NextRequest) {
 	try {
 		const { id } = await req.json()
 
-		console.log('id que chegou na rota: ', id)
-
 		await prisma.item.delete({
 			where: {
 				id,
