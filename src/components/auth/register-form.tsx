@@ -16,7 +16,7 @@ import {
 import Link from 'next/link'
 import { OrLine } from './or-line'
 import { toast } from 'sonner'
-import { signUp } from '@/lib/auth-client'
+import { signIn, signUp } from '@/lib/auth-client'
 import { useAuthState } from '@/hooks/useAuthState'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
@@ -40,6 +40,12 @@ export function RegisterForm() {
 			confirmPassword: '',
 		},
 	})
+
+	async function handleGoogleSignIn() {
+		await signIn.social({
+			provider: 'google',
+		})
+	}
 
 	async function onSubmit(values: z.infer<typeof registerFormSchema>) {
 		try {
@@ -203,7 +209,11 @@ export function RegisterForm() {
 					Entrar
 				</GradientButton>
 				<OrLine />
-				<GradientButton variant="google" className="flex items-center gap-2" />
+				<GradientButton
+					variant="google"
+					className="flex items-center gap-2"
+					onClick={() => handleGoogleSignIn()}
+				/>
 				<div className="text-center -mt-7">
 					<Link
 						href="/login"
