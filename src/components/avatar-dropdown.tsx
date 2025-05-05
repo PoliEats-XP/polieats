@@ -40,7 +40,12 @@ export function AvatarDropdown() {
 			<DropdownMenu>
 				<DropdownMenuTrigger className="cursor-pointer">
 					<Avatar>
-						<AvatarImage src={session?.user.image || ''} />
+						<AvatarImage
+							src={
+								session?.user.image ||
+								'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541'
+							}
+						/>
 						<AvatarFallback>GB</AvatarFallback>
 					</Avatar>
 				</DropdownMenuTrigger>

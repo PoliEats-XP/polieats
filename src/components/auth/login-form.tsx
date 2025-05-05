@@ -46,6 +46,12 @@ export function Form() {
 		},
 	})
 
+	async function handleGoogleSignIn() {
+		await signIn.social({
+			provider: 'google',
+		})
+	}
+
 	async function onSubmit(values: z.infer<typeof loginFormSchema>) {
 		try {
 			await signIn.email(
@@ -163,7 +169,11 @@ export function Form() {
 					Entrar
 				</GradientButton>
 				<OrLine />
-				<GradientButton variant="google" className="flex items-center gap-2" />
+				<GradientButton
+					variant="google"
+					className="flex items-center gap-2"
+					onClick={() => handleGoogleSignIn()}
+				/>
 				<div className="text-center -mt-7">
 					<Link
 						href="/register"
