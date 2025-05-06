@@ -4,9 +4,10 @@ import { cn } from '@/lib/utils'
 
 interface OrderStatusBadgeProps {
 	status: 'PENDING' | 'COMPLETED' | 'CANCELED'
+	className?: string
 }
 
-export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
+export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
 	// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
 	// biome-ignore lint/style/useSingleVarDeclarator: <explanation>
 	let icon, statusLabel, borderColor
@@ -35,7 +36,7 @@ export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
 	return (
 		<Badge
 			variant="outline"
-			className={cn('flex items-center gap-2', borderColor)}
+			className={cn('flex items-center gap-2', borderColor, className)}
 		>
 			{icon}
 			{statusLabel}

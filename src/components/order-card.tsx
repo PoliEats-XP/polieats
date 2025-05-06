@@ -1,5 +1,6 @@
 import { Card, CardDescription, CardFooter, CardHeader } from './ui/card'
 import { OrderStatusBadge } from './order-status-badge'
+import { OrderDetailsDialog } from './order-details-dialog'
 
 interface OrderCardProps {
 	order: {
@@ -7,7 +8,7 @@ interface OrderCardProps {
 		status: 'PENDING' | 'COMPLETED' | 'CANCELED'
 		date: string
 		total: number
-		items: { name: string; quantity: number }[]
+		items: { name: string; price: number; quantity: number }[]
 	}
 }
 
@@ -26,6 +27,7 @@ export function OrderCard({ order }: OrderCardProps) {
 			</div>
 			<CardFooter className="flex justify-between items-center">
 				<p>Valor total do pedido: R$ {order.total}</p>
+				<OrderDetailsDialog order={order} />
 			</CardFooter>
 			{/* Check details dialog */}
 		</Card>

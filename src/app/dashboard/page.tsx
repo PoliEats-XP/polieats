@@ -7,15 +7,15 @@ export default function Dashboard() {
 		status: 'PENDING' | 'COMPLETED' | 'CANCELED'
 		date: string
 		total: number
-		items: { name: string; quantity: number }[]
+		items: { name: string; price: number; quantity: number }[]
 	} = {
 		id: '12345',
 		date: '2023-10-01',
-		status: 'COMPLETED',
+		status: 'PENDING',
 		total: 100.0,
 		items: [
-			{ name: 'Item 1', quantity: 2 },
-			{ name: 'Item 2', quantity: 1 },
+			{ name: 'Item 1', price: 15, quantity: 2 },
+			{ name: 'Item 2', price: 8, quantity: 1 },
 		],
 	}
 
