@@ -1,8 +1,10 @@
 import { Card, CardDescription, CardFooter, CardHeader } from './ui/card'
+import { OrderStatusBadge } from './order-status-badge'
 
 interface OrderCardProps {
 	order: {
 		id: string
+		status: 'PENDING' | 'COMPLETED' | 'CANCELED'
 		date: string
 		total: number
 		items: { name: string; quantity: number }[]
@@ -16,6 +18,7 @@ export function OrderCard({ order }: OrderCardProps) {
 				<CardHeader className="flex justify-between items-center font-medium text-2xl">
 					<p>Pedido {order.id}</p>
 					{/* Order Status Badge */}
+					<OrderStatusBadge status={order.status} />
 				</CardHeader>
 				<CardDescription className="pl-6 -mt-1 font-light text-[#7d7d7d]">
 					{order.date}
