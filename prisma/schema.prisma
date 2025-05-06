@@ -119,7 +119,6 @@ model Item {
 
 enum OrderStatus {
   PENDING
-  CONFIRMED
+  COMPLETED
   CANCELLED
-  DELIVERED
 }
