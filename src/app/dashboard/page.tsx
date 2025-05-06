@@ -11,7 +11,7 @@ export default function Dashboard() {
 	} = {
 		id: '12345',
 		date: '2023-10-01',
-		status: 'CANCELED',
+		status: 'COMPLETED',
 		total: 100.0,
 		items: [
 			{ name: 'Item 1', quantity: 2 },
