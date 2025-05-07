@@ -16,18 +16,9 @@ import {
 } from '../ui/drawer'
 import { OrderDetailsDrawerFooter } from './ui/details-footer'
 import { DetailsItems } from './ui/details-items'
+import type { Order } from '@/types'
 
-interface OrderDetailsProps {
-	order: {
-		id: string
-		status: 'PENDING' | 'COMPLETED' | 'CANCELED'
-		date: string
-		total: number
-		items: { name: string; price: number; quantity: number }[]
-	}
-}
-
-export function OrderDetails({ order }: OrderDetailsProps) {
+export function OrderDetails({ order }: Order) {
 	const [open, setOpen] = useState(false)
 	const [openConfirmation, setOpenConfirmation] = useState(false)
 	const [isDesktop, setIsDesktop] = useState<boolean | null>(null)

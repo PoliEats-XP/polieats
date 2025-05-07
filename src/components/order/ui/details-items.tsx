@@ -1,15 +1,10 @@
+import type { Order } from '@/types'
+
 interface DetailsItemsProps {
-	order: {
-		id: string
-		status: 'PENDING' | 'COMPLETED' | 'CANCELED'
-		date: string
-		total: number
-		items: { name: string; price: number; quantity: number }[]
-	}
 	component: 'drawer' | 'dialog'
 }
 
-export function DetailsItems({ order, component }: DetailsItemsProps) {
+export function DetailsItems({ component, order }: DetailsItemsProps & Order) {
 	return (
 		<>
 			{order.items.map((item, index) => (
