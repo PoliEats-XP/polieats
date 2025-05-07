@@ -75,7 +75,7 @@ export function ItemForm({
 					name="name"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								Nome do item
 							</FormLabel>
 							<FormControl>
@@ -96,7 +96,7 @@ export function ItemForm({
 					name="initial_available_quantity"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								Quantidade inicial do item
 							</FormLabel>
 							<FormControl>
@@ -119,7 +119,7 @@ export function ItemForm({
 					name="price"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								Preço do item
 							</FormLabel>
 							<FormControl>

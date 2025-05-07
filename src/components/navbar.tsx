@@ -27,7 +27,7 @@ export function Navbar({
 			<div className="flex flex-col md:flex-row md:items-center gap-4">
 				{activeLink === 'orders' ? (
 					<>
-						<p className="bg-gradient-to-r from-[#ED2152] to-[#C71585] text-transparent bg-clip-text">
+						<p className="bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text">
 							Pedidos
 						</p>
 						<Link
@@ -42,7 +42,7 @@ export function Navbar({
 						<Link href="/dashboard" className="hover:opacity-80 transition">
 							Pedidos
 						</Link>
-						<p className="bg-gradient-to-r from-[#ED2152] to-[#C71585] text-transparent bg-clip-text">
+						<p className="bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text">
 							Menu
 						</p>
 					</>
@@ -61,7 +61,7 @@ export function Navbar({
 						width={40}
 						height={40}
 					/>
-					<h1 className="text-2xl bg-gradient-to-r from-[#ED2152] to-[#C71585] text-transparent bg-clip-text font-normal">
+					<h1 className="text-2xl bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text font-normal">
 						polieats
 					</h1>
 				</Link>

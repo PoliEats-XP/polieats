@@ -66,12 +66,12 @@ export default function Dashboard() {
 						{[...Array(6)].map((_, idx) => (
 							<div
 								key={idx}
-								className="h-40 bg-gray-100 dark:bg-[#333] animate-pulse rounded-lg"
+								className="h-40 bg-gray-100 dark:bg-gray-1200 animate-pulse rounded-lg"
 							/>
 						))}
 					</div>
 				) : error ? (
-					<div className="text-center text-red-600 mt-20">
+					<div className="text-center mt-20">
 						Ocorreu um erro ao carregar o cardápio. Tente novamente mais tarde.
 					</div>
 				) : filteredItems.length > 0 ? (

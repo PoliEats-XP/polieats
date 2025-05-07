@@ -107,7 +107,7 @@ export function RegisterForm() {
 					name="name"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								Nome
 							</FormLabel>
 							<FormControl>
@@ -122,7 +122,7 @@ export function RegisterForm() {
 					name="email"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								E-mail
 							</FormLabel>
 							<FormControl>
@@ -141,7 +141,7 @@ export function RegisterForm() {
 					name="password"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								Senha
 							</FormLabel>
 							<FormControl>
@@ -163,7 +163,7 @@ export function RegisterForm() {
 					name="confirmPassword"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								Confirmar senha
 							</FormLabel>
 							<FormControl>
@@ -217,7 +217,7 @@ export function RegisterForm() {
 				<div className="text-center -mt-7">
 					<Link
 						href="/login"
-						className="text-xs text-[#7d7d7d] hover:text-[#7d7d7d/80] underline"
+						className="text-xs text-midgray hover:text-midgray/80 underline"
 					>
 						Já tem uma conta? <span className="underline">Faça login aqui</span>
 					</Link>

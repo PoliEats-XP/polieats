@@ -27,7 +27,7 @@ export function GradientButton({
 					disabled={disabled || loading}
 					onClick={onClick}
 					className={cn(
-						'text-white bg-gradient-to-r from-[#ED2152] from-0% to-[#C71585] to-80% w-full font-normal py-5 cursor-pointer hover:opacity-80 transition-opacity duration-200 ease-in-out',
+						'text-white bg-gradient-to-r from-gradient-from from-0% to-gradient-to to-80% w-full font-normal py-5 cursor-pointer hover:opacity-80 transition-opacity duration-200 ease-in-out',
 						className
 					)}
 				>
@@ -40,11 +40,11 @@ export function GradientButton({
 					)}
 				</Button>
 			) : (
-				<div className="relative p-px bg-gradient-to-r from-[#ED2152] from-0% to-[#C71585] to-80% rounded-md shadow-sm -mt-5">
+				<div className="relative p-px bg-gradient-to-r from-gradient-from from-0% to-gradient-to to-80% rounded-md shadow-sm -mt-5">
 					<Button
 						onClick={onClick}
 						type="button"
-						className="flex items-center w-full cursor-pointer bg-white dark:bg-[#0a0a0a] text-[#ED2152] hover:bg-gradient-to-r hover:from-[#ED2152] hover:from-0% hover:to-[#C71585] hover:to-80% hover:text-white transition-all duration-300"
+						className="flex items-center w-full cursor-pointer bg-white dark:bg-google-bg text-gradient-from hover:bg-gradient-to-r hover:from-gradient-from hover:from-0% hover:to-gradient-to hover:to-80% hover:text-white transition-all duration-300"
 					>
 						<Chrome />
 						<span className="font-normal">Entrar com Google</span>
