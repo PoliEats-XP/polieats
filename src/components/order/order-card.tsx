@@ -1,4 +1,4 @@
-import { Card, CardDescription, CardFooter, CardHeader } from './ui/card'
+import { Card, CardDescription, CardFooter, CardHeader } from '../ui/card'
 import { OrderStatusBadge } from './order-status-badge'
 // import { OrderDetailsDialog } from './order-details-dialog'
 import { OrderDetails } from './order-details'

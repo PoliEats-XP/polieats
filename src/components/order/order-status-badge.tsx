@@ -1,5 +1,5 @@
 import { CheckCircle, Clock, XCircle } from 'lucide-react'
-import { Badge } from './ui/badge'
+import { Badge } from '../ui/badge'
 import { cn } from '@/lib/utils'
 
 interface OrderStatusBadgeProps {

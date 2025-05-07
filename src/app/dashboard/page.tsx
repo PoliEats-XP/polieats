@@ -1,5 +1,5 @@
 import { Navbar } from '@/components/navbar'
-import { OrderCard } from '@/components/order-card'
+import { OrderCard } from '@/components/order/order-card'
 
 export default function Dashboard() {
 	const testOrder: {
@@ -11,7 +11,7 @@ export default function Dashboard() {
 	} = {
 		id: '12345',
 		date: '2023-10-01',
-		status: 'COMPLETED',
+		status: 'PENDING',
 		total: 100.0,
 		items: [
 			{ name: 'Item 1', price: 15, quantity: 2 },
