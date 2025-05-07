@@ -6,7 +6,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '../ui/dialog'
-import { ItemForm } from './add-item-form'
+import { ItemForm } from './item-form'
 import type { itemFormSchema } from '@/lib/schemas/menu.schemas'
 
 type ManageItemDialogProps = {

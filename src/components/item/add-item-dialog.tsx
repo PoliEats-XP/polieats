@@ -8,7 +8,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '../ui/dialog'
-import { ItemForm } from './add-item-form'
+import { ItemForm } from './item-form'
 import type { z } from 'zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { addItemMutation, deleteItemMutation } from '@/utils/mutations'
