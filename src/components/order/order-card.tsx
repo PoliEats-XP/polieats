@@ -11,7 +11,7 @@ export function OrderCard({ order }: Order) {
 					<p>Pedido {order.id}</p>
 					<OrderStatusBadge status={order.status} />
 				</CardHeader>
-				<CardDescription className="pl-6 -mt-1 font-light text-[#7d7d7d]">
+				<CardDescription className="pl-6 -mt-1 font-light text-midgray">
 					{order.date}
 				</CardDescription>
 			</div>

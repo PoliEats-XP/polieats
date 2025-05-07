@@ -89,7 +89,7 @@ export function Form() {
 					name="email"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								E-mail
 							</FormLabel>
 							<FormControl>
@@ -108,7 +108,7 @@ export function Form() {
 					name="password"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-[#7d7d7d] text-lg rounded-[3px]">
+							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
 								Senha
 							</FormLabel>
 							<FormControl>
@@ -122,7 +122,7 @@ export function Form() {
 									<div className="text-right">
 										<Link
 											href="/forgot-password"
-											className="text-xs text-[#7d7d7d] hover:text-[#7d7d7d/80] underline"
+											className="text-xs text-midgray hover:text-midgray/80 underline"
 										>
 											Esqueci minha senha
 										</Link>
@@ -170,7 +170,7 @@ export function Form() {
 				<div className="text-center -mt-7">
 					<Link
 						href="/register"
-						className="text-xs text-[#7d7d7d] hover:text-[#7d7d7d/80] underline"
+						className="text-xs text-midgray hover:text-midgray/80 underline"
 					>
 						Não tem uma conta?{' '}
 						<span className="underline">Cadastre-se aqui</span>

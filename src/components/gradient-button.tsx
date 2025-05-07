@@ -44,7 +44,7 @@ export function GradientButton({
 					<Button
 						onClick={onClick}
 						type="button"
-						className="flex items-center w-full cursor-pointer bg-white dark:bg-[#0a0a0a] text-gradient-from hover:bg-gradient-to-r hover:from-gradient-from hover:from-0% hover:to-gradient-to hover:to-80% hover:text-white transition-all duration-300"
+						className="flex items-center w-full cursor-pointer bg-white dark:bg-google-bg text-gradient-from hover:bg-gradient-to-r hover:from-gradient-from hover:from-0% hover:to-gradient-to hover:to-80% hover:text-white transition-all duration-300"
 					>
 						<Chrome />
 						<span className="font-normal">Entrar com Google</span>
