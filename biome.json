@@ -10,15 +10,18 @@
       "a11y": {
         "useButtonType": "off",
         "useValidAnchor": "off",
-        "noSvgWithoutTitle": "off"
+        "noSvgWithoutTitle": "off",
+        "useKeyWithClickEvents": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off",
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noImplicitAnyLet": "off"
       },
       "style": {
         "useSelfClosingElements": "off",
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "useSingleVarDeclarator": "off"
       },
       "correctness": {
         "useExhaustiveDependencies": "off"

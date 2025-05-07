@@ -8,8 +8,6 @@ interface OrderStatusBadgeProps {
 }
 
 export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
-	// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
-	// biome-ignore lint/style/useSingleVarDeclarator: <explanation>
 	let icon, statusLabel, borderColor
 
 	switch (status) {

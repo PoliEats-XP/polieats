@@ -28,15 +28,8 @@ export function Form() {
 	const { theme } = useTheme()
 
 	const router = useRouter()
-	const {
-		error,
-		success,
-		loading,
-		setSuccess,
-		setError,
-		setLoading,
-		resetState,
-	} = useAuthState()
+	const { loading, setSuccess, setError, setLoading, resetState } =
+		useAuthState()
 
 	const form = useForm<z.infer<typeof loginFormSchema>>({
 		resolver: zodResolver(loginFormSchema),

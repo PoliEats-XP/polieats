@@ -1,12 +1,5 @@
 import { Button } from './ui/button'
-import {
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from './ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
 
 interface ConfirmOrderCancelDialogProps {
 	open: boolean
@@ -21,8 +14,6 @@ export function ConfirmOrderCancelDialog({
 	onClose,
 	deleteOrder,
 }: ConfirmOrderCancelDialogProps) {
-	// TODO: Implement cancel order functionality
-
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
