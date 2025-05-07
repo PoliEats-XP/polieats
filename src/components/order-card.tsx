@@ -1,6 +1,7 @@
 import { Card, CardDescription, CardFooter, CardHeader } from './ui/card'
 import { OrderStatusBadge } from './order-status-badge'
-import { OrderDetailsDialog } from './order-details-dialog'
+// import { OrderDetailsDialog } from './order-details-dialog'
+import { OrderDetails } from './order-details'
 
 interface OrderCardProps {
 	order: {
@@ -27,7 +28,8 @@ export function OrderCard({ order }: OrderCardProps) {
 			</div>
 			<CardFooter className="flex justify-between items-center">
 				<p>Valor total do pedido: R$ {order.total}</p>
-				<OrderDetailsDialog order={order} />
+				{/* <OrderDetailsDialog order={order} /> */}
+				<OrderDetails order={order} />
 			</CardFooter>
 			{/* Check details dialog */}
 		</Card>
