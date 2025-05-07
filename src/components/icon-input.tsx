@@ -57,7 +57,7 @@ export function IconInput({
 		<div className="relative">
 			{LeftIcon && (
 				<LeftIcon
-					className={`absolute left-3 top-1/2 h-${leftIconSize} w-${leftIconSize} -translate-y-1/2 text-[#BBBBBB]`}
+					className={`absolute left-3 top-1/2 h-${leftIconSize} w-${leftIconSize} -translate-y-1/2 text-placeholder`}
 				/>
 			)}
 			<Input
@@ -66,7 +66,7 @@ export function IconInput({
 				value={value}
 				onChange={handleChange}
 				className={cn(
-					'px-14 py-6 text-base placeholder:text-lg placeholder:text-[#BBBBBB] placeholder:font-light',
+					'px-14 py-6 text-base placeholder:text-lg placeholder:text-placeholder placeholder:font-light',
 					inputType === 'number' &&
 						'[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
 					className
@@ -83,9 +83,9 @@ export function IconInput({
 					disabled={disabled}
 				>
 					{showPassword ? (
-						<EyeOff className="h-5 w-5 text-[#BBBBBB] size-5" />
+						<EyeOff className="h-5 w-5 text-placeholder size-5" />
 					) : (
-						<Eye className="h-5 w-5 text-[#BBBBBB] size-5" />
+						<Eye className="h-5 w-5 text-placeholder size-5" />
 					)}
 					<span className="sr-only">
 						{showPassword ? 'Hide password' : 'Show password'}
