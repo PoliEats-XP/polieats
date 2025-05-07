@@ -11,7 +11,7 @@ export default function Login() {
 
 			<AuthHero />
 
-			<p className="text-lg text-[#7D7D7D] font-light mb-6">
+			<p className="text-lg text-midgray font-light mb-6">
 				Bem-vindo de volta, faça login para continuar
 			</p>
 
