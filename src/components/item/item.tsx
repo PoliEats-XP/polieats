@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardFooter } from '../ui/card'
-import { MangeItemDialog } from './manage-item-dialog'
+import { ManageItem } from './manage-item'
 
 interface ItemProps {
 	id: string
@@ -37,7 +37,7 @@ export function Item({ id, name, available_quantity, price }: ItemProps) {
 					</Button>
 				</CardFooter>
 			</Card>
-			<MangeItemDialog
+			<ManageItem
 				item_id={id}
 				open={open}
 				onOpenChange={onOpenChange}

@@ -1,7 +1,7 @@
 'use client'
 
 import { EmptyState } from '@/components/empty-state'
-import { AddItemDialog } from '@/components/item/add-item-dialog'
+import { AddItem } from '@/components/item/add-item'
 import { Item } from '@/components/item/item'
 import { Navbar } from '@/components/navbar'
 import { SearchInput } from '@/components/search-input'
@@ -58,7 +58,7 @@ export default function Dashboard() {
 						Adicionar item
 					</Button>
 
-					<AddItemDialog open={open} onOpenChange={setOpen} />
+					<AddItem open={open} onOpenChange={setOpen} />
 				</div>
 
 				{isLoading ? (
