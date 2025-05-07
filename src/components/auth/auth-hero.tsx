@@ -9,7 +9,7 @@ export function AuthHero() {
 				height={80}
 				width={80}
 			/>
-			<h1 className="text-2xl bg-gradient-to-r from-[#ED2152] from-0% to-[#C71585] to-80% text-transparent bg-clip-text mt-4">
+			<h1 className="text-2xl bg-gradient-to-r from-gradient-from from-0% to-gradient-to to-80% text-transparent bg-clip-text mt-4">
 				polieats
 			</h1>
 		</>
