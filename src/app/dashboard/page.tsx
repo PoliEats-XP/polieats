@@ -1,5 +1,5 @@
 import { Navbar } from '@/components/navbar'
-import { OrderCard } from '@/components/order-card'
+import { OrderCard } from '@/components/order/order-card'
 
 export default function Dashboard() {
 	const testOrder: {

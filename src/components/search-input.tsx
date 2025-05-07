@@ -57,19 +57,18 @@ export function SearchInput({
 				onFocus={() => setIsFocused(true)}
 				onBlur={() => setTimeout(() => setIsFocused(false), 200)}
 				className={cn(
-					'px-14 py-4 text-base placeholder:text-normal placeholder:text-[#BBBBBB] placeholder:font-light disabled:cursor-not-allowed hover:cursor-not-allowed',
+					'px-14 py-4 text-base placeholder:text-normal placeholder:text-[#BBBBBB] placeholder:font-light disabled:cursor-not-allowed cursor-text',
 					className
 				)}
 				disabled={disabled}
 			/>
 
 			{isFocused && search && filteredItems.length > 0 && (
-				<div className="absolute z-10 mt-2 w-full rounded-md border border-gray-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+				<div className="absolute z-10 mt-2 w-full rounded-md border border-gray-200 bg-white dark:border-[#222] dark:bg-[#222] shadow-lg max-h-60 overflow-y-auto">
 					{filteredItems.map((item) => (
-						// biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 						<div
 							key={item.id}
-							className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+							className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-[#333] transition-all"
 							onClick={() => handleSelect(item)}
 						>
 							{item.name} - R${item.price}
@@ -79,7 +78,7 @@ export function SearchInput({
 			)}
 
 			{isFocused && search && filteredItems.length === 0 && (
-				<div className="absolute z-10 mt-2 w-full rounded-md border border-gray-200 bg-white shadow-lg px-4 py-2">
+				<div className="absolute z-10 mt-2 w-full rounded-md border border-gray-200 bg-white dark:border-[#333] dark:bg-[#333] shadow-lg px-4 py-2">
 					Nenhum item encontrado
 				</div>
 			)}

@@ -1,5 +1,5 @@
 import { CheckCircle, Clock, XCircle } from 'lucide-react'
-import { Badge } from './ui/badge'
+import { Badge } from '../ui/badge'
 import { cn } from '@/lib/utils'
 
 interface OrderStatusBadgeProps {
@@ -8,8 +8,6 @@ interface OrderStatusBadgeProps {
 }
 
 export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
-	// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
-	// biome-ignore lint/style/useSingleVarDeclarator: <explanation>
 	let icon, statusLabel, borderColor
 
 	switch (status) {

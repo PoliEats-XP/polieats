@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardFooter } from '../ui/card'
-import { MangeItemDialog } from './manage-item-dialog'
+import { ManageItem } from './manage-item'
 
 interface ItemProps {
 	id: string
@@ -19,7 +19,9 @@ export function Item({ id, name, available_quantity, price }: ItemProps) {
 		<>
 			<Card className="flex flex-col justify-between h-full rounded-sm">
 				<CardContent className="p-2 -mt-6 ml-1">
-					<h2 className="text-xl font-bold text-black">{name}</h2>
+					<h2 className="text-xl font-bold text-black dark:text-white">
+						{name}
+					</h2>
 					<p className="text-[#7d7d7d] mt-2 font-light">
 						Quantidade disponível: {available_quantity}
 					</p>
@@ -35,7 +37,7 @@ export function Item({ id, name, available_quantity, price }: ItemProps) {
 					</Button>
 				</CardFooter>
 			</Card>
-			<MangeItemDialog
+			<ManageItem
 				item_id={id}
 				open={open}
 				onOpenChange={onOpenChange}

@@ -27,7 +27,6 @@ export function GradientButton({
 					disabled={disabled || loading}
 					onClick={onClick}
 					className={cn(
-						// colocar -mt-3 no criar conta e login
 						'text-white bg-gradient-to-r from-[#ED2152] from-0% to-[#C71585] to-80% w-full font-normal py-5 cursor-pointer hover:opacity-80 transition-opacity duration-200 ease-in-out',
 						className
 					)}
