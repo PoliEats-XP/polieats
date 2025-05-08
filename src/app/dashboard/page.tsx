@@ -1,5 +1,11 @@
 import { Navbar } from '@/components/navbar'
 import { OrderCard } from '@/components/order/order-card'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+	title: 'PoliEats - Dashboard',
+	description: 'Dashboard page for PoliEats',
+}
 
 export default function Dashboard() {
 	const testOrder: {

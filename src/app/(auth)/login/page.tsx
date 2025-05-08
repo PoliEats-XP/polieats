@@ -1,8 +1,12 @@
-'use client'
-
 import { AuthHero } from '@/components/auth/auth-hero'
 import { Form } from '@/components/auth/login-form'
 import CookieConsent from '@/components/ui/cookie-consent'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+	title: 'PoliEats - Login',
+	description: 'Login page for PoliEats',
+}
 
 export default function Login() {
 	return (
