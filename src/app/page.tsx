@@ -1,3 +1,4 @@
+import { EmailVerificationBanner } from '@/components/email-verification-banner'
 import { Navbar } from '@/components/navbar'
 import { ProfileDialog } from '@/components/profile-dialog'
 
@@ -9,6 +10,7 @@ export const metadata = {
 export default function Home() {
 	return (
 		<>
+			<EmailVerificationBanner />
 			<Navbar />
 
 			<h1>Hello World</h1>
