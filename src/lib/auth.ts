@@ -20,10 +20,11 @@ export const auth = betterAuth({
 	plugins: [
 		openAPI(),
 		admin(),
-		captcha({
-			provider: 'cloudflare-turnstile',
-			secretKey: process.env.TURNSTILE_SECRET_KEY!,
-		}),
+		// DISABLED FOR NOW
+		// captcha({
+		// 	provider: 'cloudflare-turnstile',
+		// 	secretKey: process.env.TURNSTILE_SECRET_KEY!,
+		// }),
 	],
 })
 
