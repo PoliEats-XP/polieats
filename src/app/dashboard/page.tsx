@@ -1,3 +1,4 @@
+import { EmailVerificationBanner } from '@/components/email-verification-banner'
 import { Navbar } from '@/components/navbar'
 import { OrderCard } from '@/components/order/order-card'
 import type { Metadata } from 'next'
@@ -27,6 +28,8 @@ export default function Dashboard() {
 
 	return (
 		<>
+			<EmailVerificationBanner />
+
 			<Navbar variant="admin" />
 
 			<OrderCard order={testOrder} />
