@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { DashboardClient } from '../../../components/dashboard-client'
+import { EmailVerificationBanner } from '@/components/email-verification-banner'
 
 export const metadata: Metadata = {
 	title: 'PoliEats - Dashboard - Menu',
@@ -7,5 +8,11 @@ export const metadata: Metadata = {
 }
 
 export default function Dashboard() {
-	return <DashboardClient />
+	return (
+		<>
+			<EmailVerificationBanner />
+
+			<DashboardClient />
+		</>
+	)
 }
