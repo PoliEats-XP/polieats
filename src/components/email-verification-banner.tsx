@@ -3,14 +3,9 @@
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
+import { toast } from 'sonner'
 
-interface EmailVerificationBannerProps {
-	onResendEmail?: () => void
-}
-
-export function EmailVerificationBanner({
-	onResendEmail,
-}: EmailVerificationBannerProps) {
+export function EmailVerificationBanner() {
 	const { data } = authClient.useSession()
 	const session = data
 
@@ -19,10 +14,21 @@ export function EmailVerificationBanner({
 	}
 
 	async function sendVerificationEmail() {
-		await authClient.sendVerificationEmail({
-			email: session?.user.email!,
-			callbackURL: '/',
-		})
+		try {
+			await authClient.sendVerificationEmail({
+				email: session?.user.email!,
+				callbackURL: '/',
+			})
+		} catch (error) {
+			console.error('Error sending verification email:', error)
+			return toast.error(
+				'Ocorreu um erro ao enviar o e-mail de verificação. Tente novamente mais tarde.'
+			)
+		}
+
+		toast.success(
+			'Um e-mail de verificação foi enviado para você. Verifique sua caixa de entrada!'
+		)
 	}
 
 	return (
