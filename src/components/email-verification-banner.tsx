@@ -9,7 +9,7 @@ export function EmailVerificationBanner() {
 	const { data } = authClient.useSession()
 	const session = data
 
-	if (session?.user.emailVerified) {
+	if (session?.user.emailVerified || !session) {
 		return null
 	}
 
