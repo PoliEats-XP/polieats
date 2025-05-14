@@ -24,7 +24,7 @@ import { IconInput } from '../icon-input'
 import { AtSign, Chrome, KeyRound } from 'lucide-react'
 import { GradientButton } from '../gradient-button'
 
-export function Form() {
+export function ForgetPasswordForm() {
 	const { theme } = useTheme()
 
 	const router = useRouter()

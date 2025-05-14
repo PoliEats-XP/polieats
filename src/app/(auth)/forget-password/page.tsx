@@ -1,4 +1,5 @@
 import { AuthHero } from '@/components/auth/auth-hero'
+import { ForgetPasswordForm } from '@/components/auth/forget-password-form'
 
 export default function ForgetPassword() {
 	return (
@@ -8,6 +9,8 @@ export default function ForgetPassword() {
 			<p className="text-lg text-midgray font-light mb-6 text-center">
 				Esqueceu sua senha? Não se preocupe!
 			</p>
+
+			<ForgetPasswordForm />
 		</div>
 	)
 }
