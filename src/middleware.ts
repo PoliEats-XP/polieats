@@ -2,7 +2,7 @@ import { betterFetch } from '@better-fetch/fetch'
 import type { Session } from '@/lib/auth'
 import { type NextRequest, NextResponse } from 'next/server'
 
-const authRoutes = ['/login', '/register']
+const authRoutes = ['/login', '/register', '/forgot-password']
 const authenticatedRoutes = ['/']
 const adminRoutes = ['/dashboard']
 

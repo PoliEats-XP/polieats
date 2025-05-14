@@ -8,7 +8,49 @@ export const auth = betterAuth({
 	database: prismaAdapter(prisma, {
 		provider: 'postgresql',
 	}),
-	emailAndPassword: { enabled: true },
+	emailAndPassword: {
+		enabled: true,
+		sendResetPassword: async ({ user, url, token }, request) => {
+			const name = user.name || user.email?.split('@')[0] || 'Usuário'
+
+			try {
+				sendMail({
+					to: user.email!,
+					subject: 'Redefinição de senha',
+					text: `Olá, ${name}! Você solicitou a redefinição de sua senha. Para continuar, clique no botão abaixo e siga as instruções.`,
+					html: `<div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; color: #1F2937; background-color: #ffffff;">
+    <div style="padding: 1.25rem;">
+        <h1 style="font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #1F2937;">Olá, ${name}!</h1>
+    </div>
+    <div style="padding-left: 1.25rem; padding-right: 1.25rem; padding-bottom: 1.25rem;">
+        <p style="font-size: 1rem; line-height: 1.5rem; color: #4B5563;">
+            Recebemos uma solicitação para redefinir a senha da sua conta no <strong>PoliEats</strong>. Para prosseguir, clique no botão abaixo para criar uma nova senha.
+        </p>
+        <p style="font-size: 1rem; line-height: 1.5rem; color: #4B5563;">
+            Se você não solicitou a redefinição de senha, pode ignorar este e-mail ou entrar em contato com nosso suporte.
+        </p>
+    </div>
+    <div style="padding-left: 1.25rem; padding-right: 1.25rem; padding-bottom: 1.25rem; text-align: center;">
+        <a href="${url}" style="display: inline-block; padding-top: 0.75rem; padding-bottom: 0.75rem; padding-left: 1.5rem; padding-right: 1.5rem; border-radius: 0.375rem; font-size: 1.125rem; line-height: 1.75rem; font-weight: 700; color: #ffffff; text-decoration: none; background: #ED2152;">
+            Redefinir Senha
+        </a>
+    </div>
+    <div style="padding-left: 1.25rem; padding-right: 1.25rem; padding-bottom: 1.25rem;">
+        <p style="font-size: 1rem; line-height: 1.5rem; color: #4B5563;">
+            Ou copie e cole este link no seu navegador: <a href="${url}" style="color: #ED2152; text-decoration: underline;">${url}</a>
+        </p>
+    </div>
+    <div style="padding-left: 1.25rem; padding-right: 1.25rem; padding-bottom: 1.25rem;">
+        <p style="font-size: 1rem; line-height: 1.5rem; color: #4B5563;">
+            Atenciosamente,<br>
+            Equipe PoliEats
+        </p>
+    </div>
+</div>`,
+				})
+			} catch (e) {}
+		},
+	},
 	emailVerification: {
 		sendVerificationEmail: async ({ user, url, token }, request) => {
 			const name = user.name || user.email?.split('@')[0] || 'Usuário'
