@@ -4,7 +4,6 @@ import { EmailVerificationBanner } from '@/components/email-verification-banner'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 
-// Mockar o módulo sonner
 jest.mock('sonner', () => ({
 	toast: {
 		success: jest.fn(),
@@ -12,7 +11,6 @@ jest.mock('sonner', () => ({
 	},
 }))
 
-// Mockar o authClient
 jest.mock('@/lib/auth-client', () => ({
 	authClient: {
 		useSession: jest.fn(() => ({
