@@ -13,7 +13,6 @@ import {
 	FormLabel,
 	FormMessage,
 } from './ui/form'
-import Link from 'next/link'
 import { toast } from 'sonner'
 import { authClient, signUp } from '@/lib/auth-client'
 import { useAuthState } from '@/hooks/useAuthState'
@@ -23,7 +22,7 @@ import { IconInput } from './icon-input'
 import { AtSign, KeyRound, User } from 'lucide-react'
 import { GradientButton } from './gradient-button'
 
-export function ResetPasswordForm() {
+export function ResetPasswordForm({ token }: { token: string | null }) {
 	const { theme } = useTheme()
 
 	const { loading, setLoading, resetState, setError, setSuccess } =
@@ -52,6 +51,7 @@ export function ResetPasswordForm() {
 			await authClient.resetPassword(
 				{
 					newPassword: values.confirmPassword,
+					token: token as string,
 				},
 				{
 					onRequest: () => {
@@ -75,6 +75,7 @@ export function ResetPasswordForm() {
 					},
 					onError: (error) => {
 						toast.error('Erro ao resetar sua senha cadastro!')
+						console.log(error)
 						setError(error.error.message)
 						setLoading(false)
 					},

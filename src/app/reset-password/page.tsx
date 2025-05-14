@@ -1,13 +1,22 @@
+'use client'
+
 import { AuthHero } from '@/components/auth/auth-hero'
 import { ResetPasswordForm } from '@/components/reset-password-form'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export default function ResetPassword() {
-	const token = new URLSearchParams(window.location.search).get('token')
+	const [token, setToken] = useState<string | null>(null)
 
-	if (!token) {
-		toast.error('Token não encontrado na URL')
-	}
+	useEffect(() => {
+		const urlToken = new URLSearchParams(window.location.search).get('token')
+
+		if (!urlToken) {
+			toast.error('Token não encontrado na URL')
+		}
+
+		setToken(urlToken)
+	})
 
 	return (
 		<div className="flex flex-col items-center justify-center h-screen p-4 md:p-0 max-w-md mx-auto">
@@ -17,7 +26,7 @@ export default function ResetPassword() {
 				Redefina sua senha para acessar sua conta
 			</p>
 
-			<ResetPasswordForm />
+			<ResetPasswordForm token={token} />
 		</div>
 	)
 }

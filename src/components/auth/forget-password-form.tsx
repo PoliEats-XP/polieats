@@ -35,7 +35,6 @@ export function ForgetPasswordForm() {
 		resolver: zodResolver(forgetPasswordFormSchema),
 		defaultValues: {
 			email: '',
-			// password: '',
 		},
 	})
 
@@ -58,7 +57,6 @@ export function ForgetPasswordForm() {
 						setSuccess('LoggedIn successfully')
 						setLoading(false)
 						toast.success('E-mail de redefinição de senha enviado com sucesso!')
-						router.push('/')
 					},
 					onError: (error) => {
 						setError(error.error.message)
