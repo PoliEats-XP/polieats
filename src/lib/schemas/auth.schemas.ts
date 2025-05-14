@@ -25,3 +25,14 @@ export const forgetPasswordFormSchema = z.object({
 	email: z.string().email(),
 	captcha: z.any(),
 })
+
+export const resetPasswordFormSchema = z.object({
+	password: z
+		.string()
+		.min(6, { message: 'Senha deve ter pelo menos 6 caracteres' })
+		.max(20, { message: 'Senha deve ter no máximo 20 caracteres' }),
+	confirmPassword: z
+		.string()
+		.min(6, { message: 'Senha deve ter pelo menos 6 caracteres' }),
+	captcha: z.any(),
+})

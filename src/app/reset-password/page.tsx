@@ -1,4 +1,5 @@
 import { AuthHero } from '@/components/auth/auth-hero'
+import { ResetPasswordForm } from '@/components/reset-password-form'
 import { toast } from 'sonner'
 
 export default function ResetPassword() {
@@ -15,6 +16,8 @@ export default function ResetPassword() {
 			<p className="text-lg text-midgray font-light mb-6 text-center">
 				Redefina sua senha para acessar sua conta
 			</p>
+
+			<ResetPasswordForm />
 		</div>
 	)
 }
