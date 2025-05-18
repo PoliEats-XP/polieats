@@ -66,7 +66,6 @@ export default function ChatInterface() {
         if (data.message.includes("Pedido cancelado. Se quiser começar de novo, é só me avisar.")) {
           setOrderState({ currentOrder: {}, orderConfirmed: false })
         }
-        console.log("Mensagem do front:" + data.message)
       } else {
         setConversation([...updatedConversation, {
           role: "assistant",

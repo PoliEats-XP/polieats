@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     // Gera resposta da IA
     const orderSummary = await orderService.getOrderSummary();
     const aiResponse = await aiService.generateResponse(messages, MENU, orderSummary);
-    console.log(aiResponse)
+    console.log("Resposta da IA: " + aiResponse)
     const cleanResponse = cleanAiResponse(aiResponse);
 
     // Processa comandos especiais
@@ -69,14 +69,14 @@ export async function POST(req: NextRequest) {
     } else {
       // Processamento padrão se não houver comandos explícitos
       const extractedItems = extractItemsWithQuantity(aiResponse, MENU);
-      console.log(extractedItems);
+      
 
       // Adiciona ou atualiza cada item diretamente
       if (extractedItems.length > 0) {
         await orderService.updateItemsQuantities(extractedItems);
       }
 
-      console.log(await orderService.getCurrentOrder());
+      console.log("Pedido atual: " + await orderService.getCurrentOrder());
     }
 
     //Pega total do pedido
