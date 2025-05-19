@@ -1,19 +1,22 @@
-import { MenuItem } from "../types/order.type"
+import type { MenuItem } from '../types/order'
 
 export const ERROR_MESSAGES = {
-    ITEM_NOT_FOUND: 'Desculpe, não identifiquei nenhum dos itens que você informou em nosso cardápio. Poderia me informá-los novamente, por favor?',
-    INVALID_REQUEST: 'Desculpe, não posso te atender com isso. Por favor realize seu pedido!',
-    ORDER_CANCELLED: 'Pedido cancelado. Se quiser começar de novo, é só me avisar.',
-    ORDER_CONFIRMED: 'Pedido confirmado com sucesso!',
-    PAYMENT_PROMPT: 'Qual será a forma de pagamento? (Dinheiro, Cartão ou Pix)',
-    FINAL_MESSAGE: 'Pedido finalizado! Agradecemos a preferência.'
-  }
+	ITEM_NOT_FOUND:
+		'Desculpe, não identifiquei nenhum dos itens que você informou em nosso cardápio. Poderia me informá-los novamente, por favor?',
+	INVALID_REQUEST:
+		'Desculpe, não posso te atender com isso. Por favor realize seu pedido!',
+	ORDER_CANCELLED:
+		'Pedido cancelado. Se quiser começar de novo, é só me avisar.',
+	ORDER_CONFIRMED: 'Pedido confirmado com sucesso!',
+	PAYMENT_PROMPT: 'Qual será a forma de pagamento? (Dinheiro, Cartão ou Pix)',
+	FINAL_MESSAGE: 'Pedido finalizado! Agradecemos a preferência.',
+}
 
 export const SYSTEM_PROMT = (menu: MenuItem[], orderSummary: string) => `
 Você é um chatbot de restaurante responsável por registrar pedidos. Siga rigorosamente estas etapas:
 
 Cardápio:
-${menu.map(item => `- ${item.nome}`).join('\n')}
+${menu.map((item) => `- ${item.nome}`).join('\n')}
 
 ${orderSummary}
 
