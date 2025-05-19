@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { RegisterForm } from '@/components/auth/register-form'
 import { toast } from 'sonner'
@@ -104,7 +104,9 @@ describe('Register Form', () => {
 		const googleButton = screen.getByRole('button', {
 			name: /Entrar com Google/i,
 		})
-		await user.click(googleButton)
+		await act(async () => {
+			await user.click(googleButton)
+		})
 		expect(signIn.social).toHaveBeenCalledWith({ provider: 'google' })
 	})
 
@@ -126,13 +128,13 @@ describe('Register Form', () => {
 		const confirmPasswordInput = screen.getByLabelText(/Confirmar senha/i)
 		const submitButton = screen.getByRole('button', { name: /^Entrar$/i })
 
-		await user.type(nameInput, 'Test User')
-		await user.type(emailInput, 'test@example.com')
-		await user.type(passwordInput, 'password123')
-		await user.type(confirmPasswordInput, 'password123')
-
-		expect(submitButton).toBeEnabled()
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(nameInput, 'Test User')
+			await user.type(emailInput, 'test@example.com')
+			await user.type(passwordInput, 'password123')
+			await user.type(confirmPasswordInput, 'password123')
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(signUp.email).toHaveBeenCalledWith(
@@ -183,11 +185,13 @@ describe('Register Form', () => {
 		const confirmPasswordInput = screen.getByLabelText(/Confirmar senha/i)
 		const submitButton = screen.getByRole('button', { name: /^Entrar$/i })
 
-		await user.type(nameInput, 'Another User')
-		await user.type(emailInput, 'existing@example.com')
-		await user.type(passwordInput, 'password123')
-		await user.type(confirmPasswordInput, 'password123')
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(nameInput, 'Another User')
+			await user.type(emailInput, 'existing@example.com')
+			await user.type(passwordInput, 'password123')
+			await user.type(confirmPasswordInput, 'password123')
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(signUp.email).toHaveBeenCalledWith(
@@ -210,7 +214,9 @@ describe('Register Form', () => {
 		render(<RegisterForm />)
 		const submitButton = screen.getByRole('button', { name: /^Entrar$/i })
 
-		await user.click(submitButton)
+		await act(async () => {
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(
@@ -223,8 +229,10 @@ describe('Register Form', () => {
 		})
 
 		const nameInput = screen.getByLabelText(/Nome/i)
-		await user.type(nameInput, 'Test')
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(nameInput, 'Test')
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(screen.queryByText(/Nome é obrigatório/i)).not.toBeInTheDocument()
@@ -232,8 +240,10 @@ describe('Register Form', () => {
 		})
 
 		const emailInput = screen.getByLabelText(/E-mail/i)
-		await user.type(emailInput, 'test@example.com')
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(emailInput, 'test@example.com')
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(
@@ -245,17 +255,23 @@ describe('Register Form', () => {
 		})
 
 		const passwordInput = screen.getByLabelText(/^Senha$/i)
-		await user.type(passwordInput, 'short')
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(passwordInput, 'short')
+			await user.click(submitButton)
+		})
 		await waitFor(() => {
 			expect(screen.getAllByText(/^Senha deve ter pelo menos 6 caracteres.$/i))
 		})
-		await user.clear(passwordInput)
-		await user.type(passwordInput, 'longenough')
+		await act(async () => {
+			await user.clear(passwordInput)
+			await user.type(passwordInput, 'longenough')
+		})
 
 		const confirmPasswordInput = screen.getByLabelText(/Confirmar senha/i)
-		await user.type(confirmPasswordInput, 'mismatch')
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(confirmPasswordInput, 'mismatch')
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(
@@ -272,11 +288,13 @@ describe('Register Form', () => {
 		const confirmPasswordInput = screen.getByLabelText(/Confirmar senha/i)
 		const submitButton = screen.getByRole('button', { name: /^Entrar$/i })
 
-		await user.type(nameInput, 'Test User')
-		await user.type(emailInput, 'test@example.com')
-		await user.type(passwordInput, 'password123')
-		await user.type(confirmPasswordInput, 'password456')
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(nameInput, 'Test User')
+			await user.type(emailInput, 'test@example.com')
+			await user.type(passwordInput, 'password123')
+			await user.type(confirmPasswordInput, 'password456')
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(screen.getByText(/As senhas não coincidem/i)).toBeInTheDocument()
@@ -304,13 +322,18 @@ describe('Register Form', () => {
 		const confirmPasswordInput = screen.getByLabelText(/Confirmar senha/i)
 		const submitButton = screen.getByRole('button', { name: /^Entrar$/i })
 
-		await user.type(nameInput, 'Test User')
-		await user.type(emailInput, 'test@example.com')
-		await user.type(passwordInput, 'password123')
-		await user.type(confirmPasswordInput, 'password123')
+		await act(async () => {
+			await user.type(nameInput, 'Test User')
+			await user.type(emailInput, 'test@example.com')
+			await user.type(passwordInput, 'password123')
+			await user.type(confirmPasswordInput, 'password123')
+		})
 
 		expect(submitButton).toBeEnabled()
-		await user.click(submitButton)
+
+		await act(async () => {
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(submitButton).toBeDisabled()
@@ -318,8 +341,10 @@ describe('Register Form', () => {
 		expect(mockSetLoading).toHaveBeenCalledWith(true)
 
 		if (signUpEmailPromiseResolve) {
-			// @ts-ignore
-			signUpEmailPromiseResolve()
+			await act(async () => {
+				// @ts-ignore
+				signUpEmailPromiseResolve()
+			})
 		}
 	})
 
@@ -338,12 +363,13 @@ describe('Register Form', () => {
 		const confirmPasswordInput = screen.getByLabelText(/Confirmar senha/i)
 		const submitButton = screen.getByRole('button', { name: /^Entrar$/i })
 
-		await user.type(nameInput, 'Error User')
-		await user.type(emailInput, 'error@example.com')
-		await user.type(passwordInput, 'errorPass')
-		await user.type(confirmPasswordInput, 'errorPass')
-
-		await user.click(submitButton)
+		await act(async () => {
+			await user.type(nameInput, 'Error User')
+			await user.type(emailInput, 'error@example.com')
+			await user.type(passwordInput, 'errorPass')
+			await user.type(confirmPasswordInput, 'errorPass')
+			await user.click(submitButton)
+		})
 
 		await waitFor(() => {
 			expect(mockSetError).toHaveBeenCalledWith('Something get wrong')

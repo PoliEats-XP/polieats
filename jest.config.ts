@@ -19,6 +19,14 @@ const config: Config = {
 	transformIgnorePatterns: ['/node_modules/', '\\.pnp\\.[^\\/]+$'],
 	moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 	testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[tj]s?(x)'],
+	testEnvironmentOptions: {
+		customExportConditions: [''],
+	},
+	globals: {
+		'ts-jest': {
+			isolatedModules: true,
+		},
+	},
 }
 
 export default config

@@ -22,7 +22,7 @@ export const registerFormSchema = z.object({
 })
 
 export const forgetPasswordFormSchema = z.object({
-	email: z.string().email(),
+	email: z.string().email('E-mail é obrigatório'),
 	captcha: z.any(),
 })
 
