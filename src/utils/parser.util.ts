@@ -1,4 +1,4 @@
-import { MenuItem } from '../types/order'
+import type { MenuItem } from '../types/order'
 import { ITEM_REGEX } from '../constants/regex.const'
 
 interface ProcessedCommand {
@@ -19,7 +19,7 @@ export function extractItemsWithQuantity(
 	for (const item of menu) {
 		const quantity = findQuantityInText(item.nome, relevantResponse, isRemoval)
 
-		if (!isNaN(quantity) && quantity !== 0) {
+		if (!Number.isNaN(quantity) && quantity !== 0) {
 			extractedItems.push({ id: item.id, quant: quantity })
 		}
 	}
@@ -40,9 +40,10 @@ function findQuantityInText(
 		const pattern = new RegExp(regex.replace('{item}', lowerName), 'i')
 		const match = lowerText.match(pattern)
 
+		// biome-ignore lint/complexity/useOptionalChain: <explanation>
 		if (match && match[groupIndex]) {
-			const extractedQuant = parseInt(match[groupIndex])
-			if (!isNaN(extractedQuant)) {
+			const extractedQuant = Number.parseInt(match[groupIndex])
+			if (!Number.isNaN(extractedQuant)) {
 				quantity = isRemoval ? -extractedQuant : extractedQuant
 				break
 			}
@@ -63,6 +64,7 @@ export function processMultipleCommands(
 	// Divide a resposta em partes usando os marcadores
 	const parts = response.split(/(\[.*?\])/g)
 
+	// biome-ignore lint/complexity/noForEach: <explanation>
 	parts.forEach((part) => {
 		if (part === '[removerItem]') {
 			currentType = 'remove'
@@ -125,11 +127,12 @@ function extractItemIdsFromEditLine(
 	const editPattern = /alterado\s+([\w\s]+)\s+para\s+(\d+)\s+unidades?/gi
 
 	let match
+	// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
 	while ((match = editPattern.exec(text)) !== null) {
 		const itemName = match[1].trim().toLowerCase()
-		const quantity = parseInt(match[2], 10)
+		const quantity = Number.parseInt(match[2], 10)
 
-		if (isNaN(quantity)) continue
+		if (Number.isNaN(quantity)) continue
 
 		// Busca o item correspondente no menu
 		for (const item of menu) {

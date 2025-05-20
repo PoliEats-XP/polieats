@@ -1,7 +1,13 @@
 import { OrderRepository } from '../lib/order'
 import { MenuRepository } from '../lib/menu'
-import type { Order } from '../types/order'
-import type { Decimal } from 'decimal.js'
+import type { Order, OrderItem } from '../types/order'
+
+type PaymentMethod =
+	| 'CASH'
+	| 'CREDIT_CARD'
+	| 'DEBIT_CARD'
+	| 'PIX'
+	| 'INDEFINIDO'
 
 export class OrderService {
 	private userId: string
@@ -78,19 +84,24 @@ export class OrderService {
 		if (!this.orderId) return 'No active order.'
 
 		const order = await OrderRepository.getOrderById(this.orderId)
+
+		console.log('order', order)
+
 		if (!order || order.items.length === 0) {
 			return 'Nenhum item no pedido.'
 		}
 
 		const menu = await MenuRepository.getMenuItems()
 		const items = order.items
-			.map((item: { itemId: unknown; quantity: unknown }) => {
-				const menuItem = menu.find((m) => m.id === Number(item.itemId))
+			.map((item: { id: string; quantity: number; name: string }) => {
+				const menuItem = menu.find((m: any) => m.id === item.id)
 				return menuItem
 					? `- ${menuItem.nome} (quantity: ${item.quantity})`
-					: null
+					: `- ${item.name} (quantity: ${item.quantity})`
 			})
 			.filter(Boolean)
+
+		console.log('items', items)
 
 		const total = await OrderRepository.calculateOrderTotal(this.orderId)
 
@@ -107,13 +118,13 @@ export class OrderService {
 	}
 
 	//Define a order como confirmada
-	async confirmOrder(paymentMethod: string): Promise<void> {
+	async confirmOrder(paymentMethod: PaymentMethod): Promise<void> {
 		if (!this.orderId) throw new Error('No order initialized.')
 		await OrderRepository.confirmOrder(this.orderId, paymentMethod)
 	}
 
 	//Define o método de pagamento
-	async setPaymentMethod(paymentMethod: string): Promise<void> {
+	async setPaymentMethod(paymentMethod: PaymentMethod): Promise<void> {
 		if (!this.orderId) throw new Error('No order initialized.')
 		await OrderRepository.setPaymentMethod(this.orderId, paymentMethod)
 	}
@@ -124,7 +135,7 @@ export class OrderService {
 
 		const order = await OrderRepository.orderStatus(this.orderId)
 
-		return order?.status === 'CONFIRMED'
+		return order?.status === 'COMPLETED'
 	}
 
 	//Pega o metodo de pagamento
@@ -143,38 +154,50 @@ export class OrderService {
 		const order = await OrderRepository.getOrderById(this.orderId)
 		const menu = await MenuRepository.getMenuItems()
 
-		const itemsWithNames = order?.items.map(
-			(item: {
-				id: string
-				name: string
-				orderId: string
-				itemId: string | null
-				quantity: number
-				price: Decimal
-			}) => {
-				const menuItem = menu.find((m) => m.id === Number(item.itemId))
-				return {
-					id: Number(item.itemId),
-					quant: item.quantity,
-					name: menuItem ? menuItem.nome : `Item ${item.itemId}`,
-				}
-			}
-		)
+		const itemsWithNames =
+			order?.items
+				.map(
+					(item: {
+						itemId: number | string | null
+						quantity: number
+						name: string
+					}) => {
+						const menuItem = menu.find(
+							(m: { id: number; nome: string }) => m.id === Number(item.itemId)
+						)
+						return item.itemId
+							? {
+									id: item.itemId,
+									quant: item.quantity,
+									name: menuItem ? menuItem.nome : item.name,
+								}
+							: null
+					}
+				)
+				.filter(
+					(item): item is { id: string; quant: number; name: string } =>
+						item !== null
+				) ?? []
 
 		const total = await OrderRepository.calculateOrderTotal(this.orderId)
 
+		// Convert items to the format expected by the frontend
+		const formattedItems = itemsWithNames.reduce(
+			(acc, item) => {
+				acc[item.id] = {
+					id: item.id,
+					quant: item.quant,
+					name: item.name,
+				}
+				return acc
+			},
+			{} as Record<string, OrderItem>
+		)
+
 		return {
-			items: itemsWithNames.reduce(
-				(
-					acc: { [x: string]: { quant: number; name: string } },
-					item: { id: string | number; quant: number; name: string }
-				) => {
-					acc[item.id] = { quant: item.quant, name: item.name }
-					return acc
-				},
-				{}
-			),
+			items: formattedItems,
 			total,
+			paymentMethod: order?.paymentMethod ?? null,
 		}
 	}
 }

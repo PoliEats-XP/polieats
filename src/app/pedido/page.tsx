@@ -1,4 +1,5 @@
 'use client'
+import { authClient } from '@/lib/auth-client'
 import { useRef, useState, useEffect } from 'react'
 
 interface Conversation {
@@ -23,6 +24,7 @@ export default function ChatInterface() {
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 	const inputRef = useRef<HTMLInputElement>(null)
+	const { data: session } = authClient.useSession()
 
 	// Rola para a última mensagem
 	useEffect(() => {
@@ -48,7 +50,7 @@ export default function ChatInterface() {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					userId: null, // A DEFINIR
+					userId: session?.user.id, // A DEFINIR
 					messages: updatedConversation,
 					currentOrder: orderState.currentOrder,
 				}),
@@ -105,7 +107,9 @@ export default function ChatInterface() {
 				// Captura método de pagamento
 				if (data.message.includes('Qual será a forma de pagamento?')) {
 					const paymentMethod = inputValue.trim().toLowerCase()
-					if (['dinheiro', 'cartão', 'pix'].includes(paymentMethod)) {
+					if (
+						['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'PIX'].includes(paymentMethod)
+					) {
 						setOrderState((prev) => ({
 							...prev,
 							paymentMethod: data.paymentMethod,

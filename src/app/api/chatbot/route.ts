@@ -17,6 +17,8 @@ const AI_CONFIG = {
 	top_p: 1,
 }
 
+type PaymentMethod = 'CASH' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX'
+
 const MENU = await MenuRepository.getMenuItems()
 
 export async function POST(req: NextRequest) {
@@ -25,11 +27,16 @@ export async function POST(req: NextRequest) {
 
 		// Inicializa serviços
 		const orderService = new OrderService(userId)
+
+		console.log('userid', userId)
+
 		const aiService = new AIService(
 			process.env.OPEN_API_KEY || '',
 			'https://models.github.ai/inference',
 			AI_CONFIG
 		)
+
+		await orderService.initializeOrder()
 
 		// Gera resposta da IA
 		const orderSummary = await orderService.getOrderSummary()
@@ -39,6 +46,7 @@ export async function POST(req: NextRequest) {
 			orderSummary
 		)
 		console.log(`Resposta da IA: ${aiResponse}`)
+		console.log('order summary', orderSummary)
 		const cleanResponse = cleanAiResponse(aiResponse)
 
 		// Processa comandos especiais
@@ -84,7 +92,9 @@ export async function POST(req: NextRequest) {
 				await orderService.updateItemsQuantities(extractedItems)
 			}
 
-			console.log(`Pedido atual: ${await orderService.getCurrentOrder()}`)
+			const [order] = await Promise.all([orderService.getCurrentOrder()])
+
+			console.log('Pedido atual:', JSON.stringify(order, null, 2))
 		}
 
 		//Pega total do pedido
@@ -92,11 +102,17 @@ export async function POST(req: NextRequest) {
 
 		// Confirma o pedido no backend
 		if (cleanResponse.includes('Pedido confirmado com sucesso')) {
-			await orderService.confirmOrder('') // Confirmamos sem método de pagamento definido
+			await orderService.confirmOrder('INDEFINIDO') // Confirmamos sem método de pagamento definido
 		}
 
 		// Captura o método de pagamento no backend
-		const paymentMethods = ['dinheiro', 'cartão', 'pix']
+		const paymentMethods = [
+			'CASH',
+			'CREDIT_CARD',
+			'DEBIT_CARD',
+			'PIX',
+		] satisfies PaymentMethod[]
+
 		for (const method of paymentMethods) {
 			if (cleanResponse.toLowerCase().includes(method)) {
 				await orderService.setPaymentMethod(method)

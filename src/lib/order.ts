@@ -1,4 +1,5 @@
 import { prisma } from './prisma'
+import { Prisma } from '@prisma/client'
 
 interface OrderUpsert {
 	where: {
@@ -17,6 +18,13 @@ interface OrderUpsert {
 	}
 }
 
+type PaymentMethod =
+	| 'CASH'
+	| 'CREDIT_CARD'
+	| 'DEBIT_CARD'
+	| 'PIX'
+	| 'INDEFINIDO'
+
 export class OrderRepository {
 	// validação(banco) para ver se Order existe
 	private static async getValidatedOrder(orderId: string, status?: string) {
@@ -30,6 +38,8 @@ export class OrderRepository {
 		}
 
 		if (status && order.status !== status) {
+			console.log('order.status', order.status)
+
 			throw new Error(`Order must be in ${status} status.`)
 		}
 
@@ -64,17 +74,28 @@ export class OrderRepository {
 	) {
 		await this.getValidatedOrder(orderId, 'PENDING')
 
-		return await prisma.orderItem.upsert<OrderUpsert>({
+		const item = await prisma.item.findUnique({
+			where: { id: itemId },
+		})
+
+		if (!item) {
+			throw new Error('Item not found')
+		}
+
+		return await prisma.orderItem.upsert({
 			where: {
-				orderId_itemId: { orderId, itemId },
+				id: `${orderId}_${itemId}`,
 			},
 			update: {
-				quantity: quantity,
+				quantity,
 			},
 			create: {
-				orderId: orderId,
-				itemId: itemId,
-				quantity: quantity,
+				id: `${orderId}_${itemId}`,
+				orderId,
+				itemId,
+				quantity,
+				name: item.name,
+				price: item.price,
 			},
 		})
 	}
@@ -108,13 +129,22 @@ export class OrderRepository {
 	}
 
 	//Define o método de pagamento e o status da order como confirmed
-	static async confirmOrder(orderId: string, paymentMethod: string) {
+	static async confirmOrder(orderId: string, paymentMethod: PaymentMethod) {
 		await this.getValidatedOrder(orderId, 'PENDING')
+
+		const order = await prisma.order.findUnique({
+			where: { id: orderId },
+			include: { items: true },
+		})
+
+		if (!order) {
+			throw new Error('Order not found')
+		}
 
 		return await prisma.order.update({
 			where: { id: orderId },
 			data: {
-				status: 'CONFIRMED',
+				status: 'COMPLETED',
 				paymentMethod: paymentMethod,
 			},
 		})
@@ -142,7 +172,7 @@ export class OrderRepository {
 	//Define o método de pagamento
 	static async setPaymentMethod(
 		orderId: string,
-		paymentMethod: string
+		paymentMethod: PaymentMethod
 	): Promise<void> {
 		await this.getValidatedOrder(orderId, 'PENDING')
 
@@ -163,11 +193,14 @@ export class OrderRepository {
 			include: { items: { include: { item: true } } },
 		})
 
-		const total = order.items.reduce(
-			(sum: number, item: { quantity: number; item: { price: number } }) =>
-				sum + item.quantity * item.item.price,
-			0
-		)
+		if (!order) {
+			throw new Error('Order not found')
+		}
+
+		const total = order.items.reduce((sum, orderItem) => {
+			if (!orderItem.item) return sum
+			return sum + orderItem.quantity * Number(orderItem.item.price)
+		}, 0)
 
 		await prisma.order.update({
 			where: { id: orderId },
@@ -179,9 +212,15 @@ export class OrderRepository {
 
 	//Pega o total da order
 	static async getTotalValue(orderId: string): Promise<number> {
-		return await prisma.order.findUnique({
+		const order = await prisma.order.findUnique({
 			where: { id: orderId },
-			include: { totalPrice: true },
+			select: { totalPrice: true },
 		})
+
+		if (!order) {
+			throw new Error('Order not found')
+		}
+
+		return Number(order.totalPrice)
 	}
 }

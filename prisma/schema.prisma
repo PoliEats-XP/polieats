@@ -82,14 +82,15 @@ model Verification {
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  userId     String
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status     OrderStatus @default(PENDING)
-  totalPrice Decimal
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  items      OrderItem[]
+  id            String         @id @default(uuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        OrderStatus    @default(PENDING)
+  totalPrice    Decimal
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  items         OrderItem[]
+  paymentMethod PaymentMethod?
 
   @@map("order")
 }
@@ -121,4 +122,12 @@ enum OrderStatus {
   PENDING
   COMPLETED
   CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  INDEFINIDO
 }

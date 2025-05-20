@@ -4,7 +4,7 @@ export interface Order {
 		status: 'PENDING' | 'COMPLETED' | 'CANCELED'
 		date: string
 		total: number
-		items: { name: string; price: number; quantity: number }[]
+		item: { name: string; price: number; quantity: number }[]
 	}
 }
 
