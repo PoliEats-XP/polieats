@@ -1,166 +1,187 @@
 import { prisma } from './prisma'
 
+interface OrderUpsert {
+	where: {
+		orderId_itemId: {
+			orderId: string
+			itemId: string
+		}
+	}
+	create: {
+		orderId: string
+		itemId: string
+		quantity: number
+	}
+	update: {
+		quantity: number
+	}
+}
+
 export class OrderRepository {
+	// validação(banco) para ver se Order existe
+	private static async getValidatedOrder(orderId: string, status?: string) {
+		const order = await prisma.order.findUnique({
+			where: { id: orderId },
+			include: { items: true },
+		})
 
-    // validação(banco) para ver se Order existe
-    private static async getValidatedOrder(orderId: string, status?: string) {
-        const order = await prisma.order.findUnique({
-            where: { id: orderId },
-            include: { items: true },
-        });
+		if (!order) {
+			throw new Error('Order not found.')
+		}
 
-        if (!order) {
-            throw new Error('Order not found.');
-        }
+		if (status && order.status !== status) {
+			throw new Error(`Order must be in ${status} status.`)
+		}
 
-        if (status && order.status !== status) {
-            throw new Error(`Order must be in ${status} status.`);
-        }
+		return order
+	}
 
-        return order;
-    }
+	//Criar a order
+	static async createOrder(userId: string) {
+		return await prisma.order.create({
+			data: {
+				userId: userId,
+				totalPrice: 0,
+			},
+		})
+	}
 
-    //Criar a order 
-    static async createOrder(userId: string) {
-        return await prisma.order.create({
-            data: {
-                userId: userId,
-                totalPrice: 0,
-            }
-        });
-    }
+	//Pegar a order pelo orderId
+	static async getOrderById(orderId: string) {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-    //Pegar a order pelo orderId
-    static async getOrderById(orderId: string) {
-        await this.getValidatedOrder(orderId, 'PENDING');
+		return await prisma.order.findUnique({
+			where: { id: orderId },
+			include: { items: true },
+		})
+	}
 
-        return await prisma.order.findUnique({
-            where: { id: orderId },
-            include: { items: true },
-        });
-    }
+	//Atualizar a quantidade dos items da order
+	static async updateItemQuantity(
+		orderId: string,
+		itemId: string,
+		quantity: number
+	) {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-    //Atualizar a quantidade dos items da order
-    static async updateItemQuantity(orderId: string, itemId: string, quantity: number) {
-        await this.getValidatedOrder(orderId, 'PENDING');
+		return await prisma.orderItem.upsert<OrderUpsert>({
+			where: {
+				orderId_itemId: { orderId, itemId },
+			},
+			update: {
+				quantity: quantity,
+			},
+			create: {
+				orderId: orderId,
+				itemId: itemId,
+				quantity: quantity,
+			},
+		})
+	}
 
-        return await prisma.orderItem.upsert({
-            where: {
-                orderId_itemId: { orderId, itemId }
-            },
-            update: {
-                quantity: quantity
-            },
-            create: {
-                orderId: orderId,
-                itemId: itemId,
-                quantity: quantity
-            },
-        });
-    }
+	//Limpar(deletar) todos os items da order
+	static async clearOrder(orderId: string) {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-    //Limpar(deletar) todos os items da order 
-    static async clearOrder(orderId: string) {
-        await this.getValidatedOrder(orderId, 'PENDING');
+		return await prisma.orderItem.deleteMany({
+			where: { orderId: orderId },
+		})
+	}
 
-        return await prisma.orderItem.deleteMany({
-            where: { orderId: orderId },
-        });
-    }
+	//Deletar a order
+	static async deleteOrder(orderId: string) {
+		return await prisma.order.delete({
+			where: { id: orderId },
+		})
+	}
 
-    //Deletar a order 
-    static async deleteOrder(orderId: string) {
-        return await prisma.order.delete({
-            where: { id: orderId },
-        });
-    }
+	//Deletar um (ou vários) items em especifico da order
+	static async deleteOrderItem(orderId: string, itemId: string) {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-    //Deletar um (ou vários) items em especifico da order 
-    static async deleteOrderItem(orderId: string, itemId: string) {
-        await this.getValidatedOrder(orderId, 'PENDING');
+		return await prisma.orderItem.deleteMany({
+			where: {
+				orderId: orderId,
+				itemId: itemId,
+			},
+		})
+	}
 
-        return await prisma.orderItem.deleteMany({
-            where: {
-                orderId: orderId,
-                itemId: itemId,
-            },
-        });
-    }
+	//Define o método de pagamento e o status da order como confirmed
+	static async confirmOrder(orderId: string, paymentMethod: string) {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-    //Define o método de pagamento e o status da order como confirmed 
-    static async confirmOrder(orderId: string, paymentMethod: string) {
-        await this.getValidatedOrder(orderId, 'PENDING');
+		return await prisma.order.update({
+			where: { id: orderId },
+			data: {
+				status: 'CONFIRMED',
+				paymentMethod: paymentMethod,
+			},
+		})
+	}
 
-        return await prisma.order.update({
-            where: { id: orderId },
-            data: {
-                status: 'CONFIRMED',
-                paymentMethod: paymentMethod
-            },
-        });
-    }
+	//Pega a grande parte dos status da order
+	static async orderStatus(orderId: string) {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-    //Pega a grande parte dos status da order 
-    static async orderStatus(orderId: string) {
-        await this.getValidatedOrder(orderId, 'PENDING');
+		return await prisma.order.findUnique({
+			where: { id: orderId },
+		})
+	}
 
-        return await prisma.order.findUnique({
-            where: { id: orderId }
-        });
+	//Define o status da order como cancelled
+	static async cancelOrder(orderId: string) {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-    }
+		return await prisma.order.update({
+			where: { id: orderId },
+			data: { status: 'CANCELLED' },
+		})
+	}
 
-    //Define o status da order como cancelled 
-    static async cancelOrder(orderId: string) {
-        await this.getValidatedOrder(orderId, 'PENDING');
+	//Define o método de pagamento
+	static async setPaymentMethod(
+		orderId: string,
+		paymentMethod: string
+	): Promise<void> {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-        return await prisma.order.update({
-            where: { id: orderId },
-            data: { status: 'CANCELLED' },
-        });
-    }
+		await prisma.order.update({
+			where: { id: orderId },
+			data: {
+				paymentMethod: paymentMethod,
+			},
+		})
+	}
 
-    //Define o método de pagamento
-    static async setPaymentMethod(orderId: string, paymentMethod: string): Promise<void> {
-        await this.getValidatedOrder(orderId, 'PENDING');
+	//Calcula o total da order
+	static async calculateOrderTotal(orderId: string): Promise<number> {
+		await this.getValidatedOrder(orderId, 'PENDING')
 
-        await prisma.order.update({
-            where: { id: orderId },
-            data: {
-                paymentMethod: paymentMethod
-            }
-        });
+		const order = await prisma.order.findUnique({
+			where: { id: orderId },
+			include: { items: { include: { item: true } } },
+		})
 
-    }
+		const total = order.items.reduce(
+			(sum: number, item: { quantity: number; item: { price: number } }) =>
+				sum + item.quantity * item.item.price,
+			0
+		)
 
-    //Calcula o total da order 
-    static async calculateOrderTotal(orderId: string): Promise<number> {
-        await this.getValidatedOrder(orderId, 'PENDING');
+		await prisma.order.update({
+			where: { id: orderId },
+			data: { totalPrice: total },
+		})
 
-        const order = await prisma.order.findUnique({
-            where: { id: orderId },
-            include: { items: { include: { item: true } } },
-        });
+		return total
+	}
 
-        const total = order.items.reduce(
-            (sum: number, item: { quantity: number; item: { price: number; }; }) => sum + item.quantity * item.item.price,
-            0
-        );
-
-        await prisma.order.update({
-            where: { id: orderId },
-            data: { totalPrice: total },
-        });
-
-        return total;
-    }
-
-    //Pega o total da order
-    static async getTotalValue(orderId: string): Promise<number> {
-
-        return await prisma.order.findUnique({
-            where: { id: orderId },
-            include: { totalPrice: true },
-        });
-    }
+	//Pega o total da order
+	static async getTotalValue(orderId: string): Promise<number> {
+		return await prisma.order.findUnique({
+			where: { id: orderId },
+			include: { totalPrice: true },
+		})
+	}
 }
