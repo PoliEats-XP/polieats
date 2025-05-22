@@ -277,14 +277,17 @@ export class OrderService {
 			'Raw order for getCurrentOrder:',
 			JSON.stringify(order, null, 2)
 		)
+
+		console.log('MENU', menu)
+
 		console.log(
 			'Menu items sample:',
 			menu
 				.slice(0, 3)
-				.map((m: { id: string | number; nome: string; price: number }) => ({
+				.map((m: { id: string | number; nome: string; preco: number }) => ({
 					id: m.id,
 					nome: m.nome,
-					price: m.price,
+					preco: m.preco,
 				}))
 		)
 
@@ -321,7 +324,7 @@ export class OrderService {
 					console.log('Found menu item:', {
 						id: menuItem.id,
 						name: menuItem.nome,
-						menuPrice: menuItem.price,
+						menuPrice: menuItem.preco,
 					})
 				}
 
