@@ -238,22 +238,87 @@ export class OrderService {
 	//Define a order como confirmada
 	async confirmOrder(paymentMethod: PaymentMethod): Promise<void> {
 		if (!this.orderId) throw new Error('No order initialized.')
-		await OrderRepository.confirmOrder(this.orderId, paymentMethod)
+
+		console.log(
+			`OrderService.confirmOrder called for order ${this.orderId} with payment method ${paymentMethod}`
+		)
+
+		try {
+			// First, let's check the current order state before confirming
+			const orderBefore = await OrderRepository.getOrderById(this.orderId)
+			console.log('Order state before confirmation:', {
+				id: orderBefore?.id,
+				status: orderBefore?.status,
+				itemsCount: orderBefore?.items?.length || 0,
+				items: orderBefore?.items?.map((item) => ({
+					name: item.name,
+					quantity: item.quantity,
+					availableInventory: item.item?.quantity,
+				})),
+			})
+
+			const result = await OrderRepository.confirmOrder(
+				this.orderId,
+				paymentMethod
+			)
+			console.log('OrderRepository.confirmOrder completed successfully')
+			console.log('Confirmed order result:', {
+				id: result.id,
+				status: result.status,
+				paymentMethod: result.paymentMethod,
+				itemsCount: result.items?.length || 0,
+			})
+		} catch (error) {
+			console.error('Error in OrderService.confirmOrder:', error)
+
+			// Log specific error details for debugging
+			if (error instanceof Error) {
+				console.error('Error message:', error.message)
+				console.error('Error stack:', error.stack)
+
+				if (error.message.includes('Insufficient inventory')) {
+					console.error(
+						'INVENTORY ERROR: Order confirmation failed due to insufficient inventory'
+					)
+				}
+			}
+
+			throw error
+		}
 	}
 
 	//Define o método de pagamento
 	async setPaymentMethod(paymentMethod: PaymentMethod): Promise<void> {
+		console.log('OrderService.setPaymentMethod called with:', paymentMethod)
+		console.log('Current orderId in service:', this.orderId)
+		console.log('Current userId in service:', this.userId)
+
 		if (!this.orderId) throw new Error('No order initialized.')
 		await OrderRepository.setPaymentMethod(this.orderId, paymentMethod)
+
+		console.log('Payment method set successfully in OrderService')
 	}
 
 	//Verifica se a order esta confirmada
 	async isOrderConfirmed(): Promise<boolean> {
 		if (!this.orderId) throw new Error('No order initialized.')
 
+		console.log(
+			`OrderService.isOrderConfirmed called for order ${this.orderId}`
+		)
+
 		const order = await OrderRepository.orderStatus(this.orderId)
 
-		return order?.status === 'COMPLETED'
+		console.log('Order status from DB:', {
+			orderId: this.orderId,
+			status: order?.status,
+			paymentMethod: order?.paymentMethod,
+		})
+
+		const isConfirmed = order?.status === 'COMPLETED'
+		console.log(`Order ${this.orderId} is confirmed: ${isConfirmed}`)
+
+		return isConfirmed
 	}
 
 	//Pega o metodo de pagamento

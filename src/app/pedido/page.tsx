@@ -63,6 +63,17 @@ export default function ChatInterface() {
 
 			const data = await response.json()
 
+			console.log('API Response data:', {
+				orderConfirmed: data.orderConfirmed,
+				paymentMethod: data.paymentMethod,
+				total: data.total,
+				status: data.status,
+				currentOrder: data.currentOrder,
+				message: data.message,
+			})
+
+			console.log('Current orderState before updating:', orderState)
+
 			if (data.status === 'error') {
 				setConversation([
 					...updatedConversation,
@@ -116,19 +127,41 @@ export default function ChatInterface() {
 				// Atualiza o status de confirmação se vier do backend
 				if (data.orderConfirmed !== undefined) {
 					console.log('Order confirmed status from API:', data.orderConfirmed)
-					setOrderState((prev) => ({
-						...prev,
-						orderConfirmed: data.orderConfirmed,
-						status: data.orderConfirmed ? 'COMPLETED' : 'PENDING',
-					}))
+					console.log(
+						'Previous orderConfirmed state:',
+						orderState.orderConfirmed
+					)
+					setOrderState((prev) => {
+						const newState = {
+							...prev,
+							orderConfirmed: data.orderConfirmed,
+							status: data.orderConfirmed ? 'COMPLETED' : 'PENDING',
+						}
+						console.log(
+							'Setting new orderConfirmed state:',
+							newState.orderConfirmed
+						)
+						console.log('Complete new orderState:', newState)
+						return newState
+					})
 				}
 
 				// Atualiza o método de pagamento se vier do backend
-				if (data.paymentMethod) {
+				if (
+					data.paymentMethod !== undefined &&
+					data.paymentMethod !== null &&
+					data.paymentMethod !== 'INDEFINIDO'
+				) {
 					console.log('Payment method from API:', data.paymentMethod)
 					setOrderState((prev) => ({
 						...prev,
 						paymentMethod: data.paymentMethod,
+					}))
+				} else if (data.paymentMethod === 'INDEFINIDO') {
+					// Explicitly set INDEFINIDO if that's what we got
+					setOrderState((prev) => ({
+						...prev,
+						paymentMethod: 'INDEFINIDO',
 					}))
 				}
 			}
@@ -203,17 +236,25 @@ export default function ChatInterface() {
 				<input
 					ref={inputRef}
 					type="text"
-					placeholder={isLoading ? 'Processando...' : 'Digite sua mensagem...'}
+					placeholder={
+						orderState.orderConfirmed
+							? 'Pedido confirmado - Chat desabilitado'
+							: isLoading
+								? 'Processando...'
+								: 'Digite sua mensagem...'
+					}
 					className="input input-bordered flex-1"
 					value={inputValue}
 					onChange={handleInputChange}
 					onKeyDown={handleKeyDown}
-					disabled={isLoading}
+					disabled={isLoading || orderState.orderConfirmed}
 				/>
 				<button
 					className="btn btn-primary"
 					onClick={handleSendMessage}
-					disabled={isLoading || !inputValue.trim()}
+					disabled={
+						isLoading || !inputValue.trim() || orderState.orderConfirmed
+					}
 				>
 					{isLoading ? (
 						<span className="loading loading-spinner"></span>
@@ -221,7 +262,11 @@ export default function ChatInterface() {
 						'Enviar'
 					)}
 				</button>
-				<button className="btn btn-outline" onClick={resetConversation}>
+				<button
+					className="btn btn-outline"
+					onClick={resetConversation}
+					disabled={isLoading}
+				>
 					Novo Pedido
 				</button>
 			</div>
@@ -263,18 +308,27 @@ export default function ChatInterface() {
 
 					<div className="mt-4 pt-3 border-t border-gray-200">
 						{/* Exibe o método de pagamento se estiver definido */}
-						{orderState.paymentMethod && (
+						{orderState.paymentMethod &&
+							orderState.paymentMethod !== 'INDEFINIDO' && (
+								<div className="flex items-center gap-2 mb-2">
+									<span className="font-medium">Método de Pagamento:</span>
+									<span className="badge badge-outline">
+										{orderState.paymentMethod === 'CREDIT_CARD' &&
+											'Cartão de Crédito'}
+										{orderState.paymentMethod === 'DEBIT_CARD' &&
+											'Cartão de Débito'}
+										{orderState.paymentMethod === 'CASH' && 'Dinheiro'}
+										{orderState.paymentMethod === 'PIX' && 'PIX'}
+									</span>
+								</div>
+							)}
+
+						{/* Show payment method status if INDEFINIDO or not set */}
+						{(!orderState.paymentMethod ||
+							orderState.paymentMethod === 'INDEFINIDO') && (
 							<div className="flex items-center gap-2 mb-2">
 								<span className="font-medium">Método de Pagamento:</span>
-								<span className="badge badge-outline">
-									{orderState.paymentMethod === 'CREDIT_CARD' &&
-										'Cartão de Crédito'}
-									{orderState.paymentMethod === 'DEBIT_CARD' &&
-										'Cartão de Débito'}
-									{orderState.paymentMethod === 'CASH' && 'Dinheiro'}
-									{orderState.paymentMethod === 'PIX' && 'PIX'}
-									{orderState.paymentMethod === 'INDEFINIDO' && 'A definir'}
-								</span>
+								<span className="badge badge-warning">A definir</span>
 							</div>
 						)}
 

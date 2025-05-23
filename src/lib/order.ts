@@ -127,12 +127,20 @@ export class OrderRepository {
 			item = items[0]
 		}
 
+		// Check if the requested quantity is available
+		if (quantity > item.quantity) {
+			throw new Error(
+				`Insufficient inventory. Available: ${item.quantity}, Requested: ${quantity}`
+			)
+		}
+
 		console.log('Updating item quantity:', {
 			orderId,
 			itemId,
 			quantity,
 			itemPrice: item.price,
 			itemName: item.name,
+			availableQuantity: item.quantity,
 		})
 
 		// First try to find existing order item
@@ -243,24 +251,55 @@ export class OrderRepository {
 			})
 		}
 
-		// Set the order as COMPLETED
-		return await prisma.order.update({
-			where: { id: orderId },
-			data: {
-				status: 'COMPLETED',
-				paymentMethod: paymentMethod,
-			},
-			include: {
-				items: {
-					include: { item: true },
+		// Check inventory availability before confirming
+		for (const orderItem of order.items) {
+			if (orderItem.item && orderItem.quantity > orderItem.item.quantity) {
+				throw new Error(
+					`Insufficient inventory for ${orderItem.name}. Available: ${orderItem.item.quantity}, Requested: ${orderItem.quantity}`
+				)
+			}
+		}
+
+		// Use a transaction to ensure inventory updates and order confirmation happen together
+		const result = await prisma.$transaction(async (prisma) => {
+			// Subtract quantities from inventory
+			for (const orderItem of order.items) {
+				if (orderItem.item) {
+					await prisma.item.update({
+						where: { id: orderItem.item.id },
+						data: {
+							quantity: orderItem.item.quantity - orderItem.quantity,
+						},
+					})
+					console.log(
+						`Subtracted ${orderItem.quantity} from item ${orderItem.name}. New quantity: ${orderItem.item.quantity - orderItem.quantity}`
+					)
+				}
+			}
+
+			// Set the order as COMPLETED
+			return await prisma.order.update({
+				where: { id: orderId },
+				data: {
+					status: 'COMPLETED',
+					paymentMethod: paymentMethod,
 				},
-			},
+				include: {
+					items: {
+						include: { item: true },
+					},
+				},
+			})
 		})
+
+		console.log('Order confirmed and inventory updated successfully')
+		return result
 	}
 
 	//Pega a grande parte dos status da order
 	static async orderStatus(orderId: string) {
-		await this.getValidatedOrder(orderId, 'PENDING')
+		// Allow getting status from both PENDING and COMPLETED orders
+		await this.getValidatedOrder(orderId)
 
 		return await prisma.order.findUnique({
 			where: { id: orderId },
@@ -282,13 +321,22 @@ export class OrderRepository {
 		orderId: string,
 		paymentMethod: PaymentMethod
 	): Promise<void> {
-		await this.getValidatedOrder(orderId, 'PENDING')
+		// Allow setting payment method on both PENDING and COMPLETED orders
+		await this.getValidatedOrder(orderId)
 
-		await prisma.order.update({
+		console.log(`Setting payment method ${paymentMethod} for order ${orderId}`)
+
+		const result = await prisma.order.update({
 			where: { id: orderId },
 			data: {
 				paymentMethod: paymentMethod,
 			},
+		})
+
+		console.log('Payment method set successfully. Updated order:', {
+			id: result.id,
+			paymentMethod: result.paymentMethod,
+			status: result.status,
 		})
 	}
 
