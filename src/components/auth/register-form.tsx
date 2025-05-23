@@ -107,11 +107,19 @@ export function RegisterForm() {
 					name="name"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
+							<FormLabel
+								className="font-light text-midgray text-lg rounded-[3px]"
+								htmlFor="name"
+							>
 								Nome
 							</FormLabel>
 							<FormControl>
-								<IconInput LeftIcon={User} placeholder="John Doe" {...field} />
+								<IconInput
+									id="name"
+									LeftIcon={User}
+									placeholder="John Doe"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -122,11 +130,15 @@ export function RegisterForm() {
 					name="email"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
+							<FormLabel
+								className="font-light text-midgray text-lg rounded-[3px]"
+								htmlFor="email"
+							>
 								E-mail
 							</FormLabel>
 							<FormControl>
 								<IconInput
+									id="email"
 									LeftIcon={AtSign}
 									placeholder="email@email.com"
 									{...field}
@@ -141,12 +153,16 @@ export function RegisterForm() {
 					name="password"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
+							<FormLabel
+								className="font-light text-midgray text-lg rounded-[3px]"
+								htmlFor="password"
+							>
 								Senha
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
 									<IconInput
+										id="password"
 										LeftIcon={KeyRound}
 										placeholder="********"
 										inputType="password"
@@ -163,12 +179,16 @@ export function RegisterForm() {
 					name="confirmPassword"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
+							<FormLabel
+								className="font-light text-midgray text-lg rounded-[3px]"
+								htmlFor="confirmPassword"
+							>
 								Confirmar senha
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
 									<IconInput
+										id="confirmPassword"
 										LeftIcon={KeyRound}
 										placeholder="********"
 										inputType="password"
@@ -187,12 +207,12 @@ export function RegisterForm() {
 						<FormItem>
 							<FormControl>
 								<Turnstile
-									siteKey="1x00000000000000000000AA" // Test site key (always pass)
+									siteKey="1x00000000000000000000AA"
 									options={{
-										action: 'submit-form',
 										theme: theme === 'dark' ? 'dark' : 'light',
-										language: 'pt',
-										size: 'flexible',
+									}}
+									onSuccess={(token) => {
+										field.onChange(token)
 									}}
 								/>
 							</FormControl>

@@ -74,7 +74,7 @@ export function Form() {
 				}
 			)
 		} catch (error) {
-			console.log(error)
+			// console.log(error)
 			setError('Something get wrong')
 			toast.error('Erro ao realizar login!')
 			setLoading(false)
@@ -89,11 +89,16 @@ export function Form() {
 					name="email"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
+							<FormLabel
+								className="font-light text-midgray text-lg rounded-[3px]"
+								htmlFor="email"
+							>
 								E-mail
 							</FormLabel>
 							<FormControl>
 								<IconInput
+									id="email"
+									// name='email'
 									LeftIcon={AtSign}
 									placeholder="email@email.com"
 									{...field}
@@ -108,12 +113,17 @@ export function Form() {
 					name="password"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="font-light text-midgray text-lg rounded-[3px]">
+							<FormLabel
+								className="font-light text-midgray text-lg rounded-[3px]"
+								htmlFor="password"
+							>
 								Senha
 							</FormLabel>
 							<FormControl>
 								<div className="contents">
 									<IconInput
+										id="password"
+										// aria-labelledby="password"
 										LeftIcon={KeyRound}
 										placeholder="********"
 										inputType="password"
@@ -140,12 +150,12 @@ export function Form() {
 						<FormItem>
 							<FormControl>
 								<Turnstile
-									siteKey="1x00000000000000000000AA" // Test site key (always pass)
+									siteKey="1x00000000000000000000AA"
 									options={{
-										action: 'submit-form',
 										theme: theme === 'dark' ? 'dark' : 'light',
-										language: 'pt',
-										size: 'flexible',
+									}}
+									onSuccess={(token) => {
+										field.onChange(token)
 									}}
 								/>
 							</FormControl>

@@ -1,4 +1,5 @@
 'use client'
+import { authClient } from '@/lib/auth-client'
 import { useRef, useState, useEffect } from 'react'
 
 interface Conversation {
@@ -7,10 +8,15 @@ interface Conversation {
 }
 
 interface OrderState {
-	currentOrder: Record<number, { quant: number; name: string }>
+	currentOrder: Record<
+		string,
+		{ quant: number; name: string; id: string; price?: string | number }
+	>
 	orderConfirmed: boolean
 	paymentMethod?: string
 	total?: number
+	orderSummary?: string
+	status?: string
 }
 
 export default function ChatInterface() {
@@ -23,6 +29,7 @@ export default function ChatInterface() {
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 	const inputRef = useRef<HTMLInputElement>(null)
+	const { data: session } = authClient.useSession()
 
 	// Rola para a última mensagem
 	useEffect(() => {
@@ -48,13 +55,24 @@ export default function ChatInterface() {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					userId: null, // A DEFINIR
+					userId: session?.user.id, // A DEFINIR
 					messages: updatedConversation,
 					currentOrder: orderState.currentOrder,
 				}),
 			})
 
 			const data = await response.json()
+
+			console.log('API Response data:', {
+				orderConfirmed: data.orderConfirmed,
+				paymentMethod: data.paymentMethod,
+				total: data.total,
+				status: data.status,
+				currentOrder: data.currentOrder,
+				message: data.message,
+			})
+
+			console.log('Current orderState before updating:', orderState)
 
 			if (data.status === 'error') {
 				setConversation([
@@ -85,7 +103,7 @@ export default function ChatInterface() {
 				if (data.currentOrder) {
 					setOrderState((prev) => ({
 						...prev,
-						currentOrder: data.currentOrder,
+						currentOrder: data.currentOrder.items || data.currentOrder,
 					}))
 				}
 
@@ -97,20 +115,54 @@ export default function ChatInterface() {
 					}))
 				}
 
-				// Marca como confirmado se for a mensagem de confirmação
-				if (data.message.includes('Pedido confirmado com sucesso')) {
-					setOrderState((prev) => ({ ...prev, orderConfirmed: true }))
+				// Atualiza o resumo do pedido se disponível
+				if (data.orderSummary) {
+					console.log('Received order summary:', data.orderSummary)
+					setOrderState((prev) => ({
+						...prev,
+						orderSummary: data.orderSummary,
+					}))
 				}
 
-				// Captura método de pagamento
-				if (data.message.includes('Qual será a forma de pagamento?')) {
-					const paymentMethod = inputValue.trim().toLowerCase()
-					if (['dinheiro', 'cartão', 'pix'].includes(paymentMethod)) {
-						setOrderState((prev) => ({
+				// Atualiza o status de confirmação se vier do backend
+				if (data.orderConfirmed !== undefined) {
+					console.log('Order confirmed status from API:', data.orderConfirmed)
+					console.log(
+						'Previous orderConfirmed state:',
+						orderState.orderConfirmed
+					)
+					setOrderState((prev) => {
+						const newState = {
 							...prev,
-							paymentMethod: data.paymentMethod,
-						}))
-					}
+							orderConfirmed: data.orderConfirmed,
+							status: data.orderConfirmed ? 'COMPLETED' : 'PENDING',
+						}
+						console.log(
+							'Setting new orderConfirmed state:',
+							newState.orderConfirmed
+						)
+						console.log('Complete new orderState:', newState)
+						return newState
+					})
+				}
+
+				// Atualiza o método de pagamento se vier do backend
+				if (
+					data.paymentMethod !== undefined &&
+					data.paymentMethod !== null &&
+					data.paymentMethod !== 'INDEFINIDO'
+				) {
+					console.log('Payment method from API:', data.paymentMethod)
+					setOrderState((prev) => ({
+						...prev,
+						paymentMethod: data.paymentMethod,
+					}))
+				} else if (data.paymentMethod === 'INDEFINIDO') {
+					// Explicitly set INDEFINIDO if that's what we got
+					setOrderState((prev) => ({
+						...prev,
+						paymentMethod: 'INDEFINIDO',
+					}))
 				}
 			}
 		} catch (error) {
@@ -159,6 +211,8 @@ export default function ChatInterface() {
 		)
 	}
 
+	console.log('orderState', orderState.currentOrder)
+
 	return (
 		<div className="container mx-auto p-4 max-w-3xl">
 			<h1 className="text-4xl font-bold text-center my-6">Faça seu Pedido</h1>
@@ -182,17 +236,25 @@ export default function ChatInterface() {
 				<input
 					ref={inputRef}
 					type="text"
-					placeholder={isLoading ? 'Processando...' : 'Digite sua mensagem...'}
+					placeholder={
+						orderState.orderConfirmed
+							? 'Pedido confirmado - Chat desabilitado'
+							: isLoading
+								? 'Processando...'
+								: 'Digite sua mensagem...'
+					}
 					className="input input-bordered flex-1"
 					value={inputValue}
 					onChange={handleInputChange}
 					onKeyDown={handleKeyDown}
-					disabled={isLoading}
+					disabled={isLoading || orderState.orderConfirmed}
 				/>
 				<button
 					className="btn btn-primary"
 					onClick={handleSendMessage}
-					disabled={isLoading || !inputValue.trim()}
+					disabled={
+						isLoading || !inputValue.trim() || orderState.orderConfirmed
+					}
 				>
 					{isLoading ? (
 						<span className="loading loading-spinner"></span>
@@ -200,32 +262,86 @@ export default function ChatInterface() {
 						'Enviar'
 					)}
 				</button>
-				<button className="btn btn-outline" onClick={resetConversation}>
+				<button
+					className="btn btn-outline"
+					onClick={resetConversation}
+					disabled={isLoading}
+				>
 					Novo Pedido
 				</button>
 			</div>
 
 			{/* Resumo do Pedido*/}
-			{Object.keys(orderState.currentOrder).length > 0 && (
-				<div className="mt-6 bg-base-100 p-4 rounded-lg">
-					<h2 className="font-bold mb-2">Seu Pedido Atual:</h2>
-					<ul>
-						{Object.entries(orderState.currentOrder).map(([id, item]) => (
-							<li key={id}>
-								{item.name ? item.name : `Item ${id}`}: {item.quant}x
-							</li>
-						))}
-					</ul>
-					{/* Exibe o total se estiver disponível no estado */}
-					{orderState.total !== undefined && (
-						<p className="mt-2 font-bold">
-							Total: R$ {orderState.total.toFixed(2)}
-						</p>
+			{(Object.keys(orderState.currentOrder).length > 0 ||
+				orderState.orderSummary) && (
+				<div className="mt-6 bg-base-100 p-4 rounded-lg shadow-md">
+					<h2 className="text-xl font-bold mb-3">Seu Pedido Atual:</h2>
+
+					{/* Display formatted order summary if available */}
+					{orderState.orderSummary &&
+					orderState.orderSummary !== 'Nenhum item no pedido.' ? (
+						<div className="whitespace-pre-line">{orderState.orderSummary}</div>
+					) : (
+						<>
+							<ul className="space-y-1">
+								{Object.entries(orderState.currentOrder).map(([id, item]) => (
+									<li key={id} className="flex justify-between">
+										<span>
+											{item.name ? item.name : `Item ${id}`}: {item.quant}x
+										</span>
+										{item.price ? (
+											<span className="font-medium">
+												R$ {(Number(item.price) * item.quant).toFixed(2)}
+											</span>
+										) : null}
+									</li>
+								))}
+							</ul>
+							{/* Exibe o total se estiver disponível no estado */}
+							{orderState.total !== undefined && (
+								<p className="mt-3 font-bold text-right">
+									Total: R$ {orderState.total.toFixed(2)}
+								</p>
+							)}
+						</>
 					)}
-					{/* Exibe o método de pagamento se estiver definido */}
-					{orderState.paymentMethod && (
-						<p>Método de Pagamento: {orderState.paymentMethod}</p>
-					)}
+
+					<div className="mt-4 pt-3 border-t border-gray-200">
+						{/* Exibe o método de pagamento se estiver definido */}
+						{orderState.paymentMethod &&
+							orderState.paymentMethod !== 'INDEFINIDO' && (
+								<div className="flex items-center gap-2 mb-2">
+									<span className="font-medium">Método de Pagamento:</span>
+									<span className="badge badge-outline">
+										{orderState.paymentMethod === 'CREDIT_CARD' &&
+											'Cartão de Crédito'}
+										{orderState.paymentMethod === 'DEBIT_CARD' &&
+											'Cartão de Débito'}
+										{orderState.paymentMethod === 'CASH' && 'Dinheiro'}
+										{orderState.paymentMethod === 'PIX' && 'PIX'}
+									</span>
+								</div>
+							)}
+
+						{/* Show payment method status if INDEFINIDO or not set */}
+						{(!orderState.paymentMethod ||
+							orderState.paymentMethod === 'INDEFINIDO') && (
+							<div className="flex items-center gap-2 mb-2">
+								<span className="font-medium">Método de Pagamento:</span>
+								<span className="badge badge-warning">A definir</span>
+							</div>
+						)}
+
+						{/* Show order status */}
+						<div className="flex items-center gap-2">
+							<span className="font-medium">Status:</span>
+							<span
+								className={`badge ${orderState.orderConfirmed ? 'badge-success' : 'badge-primary'}`}
+							>
+								{orderState.orderConfirmed ? 'Confirmado' : 'Pendente'}
+							</span>
+						</div>
+					</div>
 				</div>
 			)}
 		</div>
