@@ -9,6 +9,13 @@ export interface AdminOrder {
 	status: 'PENDING' | 'COMPLETED' | 'CANCELED'
 	date: string
 	total: number
+	paymentMethod:
+		| 'CASH'
+		| 'CREDIT_CARD'
+		| 'DEBIT_CARD'
+		| 'PIX'
+		| 'INDEFINIDO'
+		| null
 	user: {
 		id: string
 		name: string

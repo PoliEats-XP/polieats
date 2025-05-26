@@ -42,6 +42,7 @@ import {
 import { toast } from 'sonner'
 import type { AdminOrdersResponse, OrderStatus } from '@/types/admin'
 import { OrderDetailsModal } from './order-details-modal'
+import { AdminOrderStatusBadge } from './admin-order-status-badge'
 
 interface OrdersTableProps {
 	className?: string
@@ -72,32 +73,6 @@ async function fetchAdminOrders({
 	}
 
 	return response.json()
-}
-
-function getStatusBadgeVariant(status: string) {
-	switch (status) {
-		case 'PENDING':
-			return 'default'
-		case 'COMPLETED':
-			return 'secondary'
-		case 'CANCELED':
-			return 'destructive'
-		default:
-			return 'outline'
-	}
-}
-
-function getStatusLabel(status: string) {
-	switch (status) {
-		case 'PENDING':
-			return 'Em andamento'
-		case 'COMPLETED':
-			return 'Concluído'
-		case 'CANCELED':
-			return 'Cancelado'
-		default:
-			return status
-	}
 }
 
 export function OrdersTable({ className }: OrdersTableProps) {
@@ -298,9 +273,7 @@ export function OrdersTable({ className }: OrdersTableProps) {
 										</TableCell>
 										<TableCell>{order.itemCount}</TableCell>
 										<TableCell>
-											<Badge variant={getStatusBadgeVariant(order.status)}>
-												{getStatusLabel(order.status)}
-											</Badge>
+											<AdminOrderStatusBadge status={order.status} />
 										</TableCell>
 										<TableCell className="text-sm">{order.date}</TableCell>
 										<TableCell className="font-medium">

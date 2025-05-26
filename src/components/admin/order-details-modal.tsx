@@ -1,6 +1,7 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
 	Dialog,
 	DialogContent,
@@ -8,11 +9,21 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
-import { User, Calendar, CreditCard, Package } from 'lucide-react'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import { User, Calendar, CreditCard, Package, Wallet, Save } from 'lucide-react'
+import { toast } from 'sonner'
 import type { AdminOrder } from '@/types/admin'
+import { useOrderStats } from '@/hooks/use-order-stats'
 
 interface OrderDetailsModalProps {
 	orderId: string | null
@@ -25,6 +36,25 @@ async function fetchOrderDetails(orderId: string): Promise<AdminOrder> {
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch order details')
+	}
+
+	return response.json()
+}
+
+async function updateOrderStatus(
+	orderId: string,
+	status: string
+): Promise<AdminOrder> {
+	const response = await fetch(`/api/admin/orders/${orderId}`, {
+		method: 'PATCH',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ status }),
+	})
+
+	if (!response.ok) {
+		throw new Error('Failed to update order status')
 	}
 
 	return response.json()
@@ -56,11 +86,32 @@ function getStatusLabel(status: string) {
 	}
 }
 
+function getPaymentMethodLabel(paymentMethod: string | null) {
+	switch (paymentMethod) {
+		case 'CASH':
+			return 'Dinheiro'
+		case 'CREDIT_CARD':
+			return 'Cartão de Crédito'
+		case 'DEBIT_CARD':
+			return 'Cartão de Débito'
+		case 'PIX':
+			return 'PIX'
+		case 'INDEFINIDO':
+			return 'Indefinido'
+		default:
+			return 'Não informado'
+	}
+}
+
 export function OrderDetailsModal({
 	orderId,
 	open,
 	onOpenChange,
 }: OrderDetailsModalProps) {
+	const [selectedStatus, setSelectedStatus] = useState<string>('')
+	const queryClient = useQueryClient()
+	const { updateStatsOptimistically } = useOrderStats()
+
 	const {
 		data: order,
 		isLoading,
@@ -72,6 +123,55 @@ export function OrderDetailsModal({
 		enabled: !!orderId && open,
 		staleTime: 1000 * 60 * 5, // 5 minutes
 	})
+
+	const updateStatusMutation = useMutation({
+		mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
+			updateOrderStatus(orderId, status),
+		onMutate: async ({ status: newStatus }) => {
+			// Optimistic update for stats
+			if (order) {
+				const oldStatus =
+					order.status === 'CANCELED' ? 'CANCELLED' : order.status
+				updateStatsOptimistically(oldStatus, newStatus, order.total)
+			}
+		},
+		onSuccess: (updatedOrder) => {
+			// Update the order details cache
+			queryClient.setQueryData(['admin-order-details', orderId], updatedOrder)
+			// Invalidate the orders list to refresh it
+			queryClient.invalidateQueries({ queryKey: ['admin-orders'] })
+			// Invalidate stats to ensure they're accurate
+			queryClient.invalidateQueries({ queryKey: ['admin-order-stats'] })
+			toast.success('Status do pedido atualizado com sucesso!')
+		},
+		onError: (error) => {
+			// Revert optimistic update on error
+			queryClient.invalidateQueries({ queryKey: ['admin-order-stats'] })
+			toast.error(`Erro ao atualizar status: ${error.message}`)
+		},
+	})
+
+	// Set initial status when order loads
+	useEffect(() => {
+		if (order?.status) {
+			setSelectedStatus(
+				order.status === 'CANCELED' ? 'CANCELLED' : order.status
+			)
+		}
+	}, [order?.status])
+
+	const handleStatusUpdate = () => {
+		if (
+			!orderId ||
+			!selectedStatus ||
+			selectedStatus ===
+				(order?.status === 'CANCELED' ? 'CANCELLED' : order?.status)
+		) {
+			return
+		}
+
+		updateStatusMutation.mutate({ orderId, status: selectedStatus })
+	}
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,6 +224,71 @@ export function OrderDetailsModal({
 											</p>
 										</div>
 									</div>
+									<div className="flex items-center space-x-2">
+										<Wallet className="w-4 h-4 text-muted-foreground" />
+										<div>
+											<p className="font-medium">Método de Pagamento</p>
+											<p className="text-sm text-muted-foreground">
+												{getPaymentMethodLabel(order.paymentMethod)}
+											</p>
+										</div>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Status Management */}
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center space-x-2">
+									<Package className="w-5 h-5" />
+									<span>Gerenciar Status</span>
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<div className="flex items-center space-x-4">
+									<div className="flex-1">
+										<div className="text-sm font-medium mb-2">
+											Atualizar Status do Pedido
+										</div>
+										<Select
+											value={selectedStatus}
+											onValueChange={setSelectedStatus}
+										>
+											<SelectTrigger>
+												<SelectValue placeholder="Selecione um status" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="PENDING">Em andamento</SelectItem>
+												<SelectItem value="COMPLETED">Concluído</SelectItem>
+												<SelectItem value="CANCELLED">Cancelado</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
+									<Button
+										onClick={handleStatusUpdate}
+										disabled={
+											updateStatusMutation.isPending ||
+											!selectedStatus ||
+											selectedStatus ===
+												(order.status === 'CANCELED'
+													? 'CANCELLED'
+													: order.status)
+										}
+										className="mt-6"
+									>
+										{updateStatusMutation.isPending ? (
+											<>
+												<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+												Atualizando...
+											</>
+										) : (
+											<>
+												<Save className="w-4 h-4 mr-2" />
+												Atualizar Status
+											</>
+										)}
+									</Button>
 								</div>
 							</CardContent>
 						</Card>

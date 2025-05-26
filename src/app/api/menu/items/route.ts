@@ -24,6 +24,42 @@ export async function POST(req: NextRequest) {
 	)
 }
 
+export async function PUT(req: NextRequest) {
+	try {
+		const { id, name, price, initial_available_quantity } = await req.json()
+
+		if (!id) {
+			return NextResponse.json(
+				{ message: 'Item ID is required' },
+				{ status: 400 }
+			)
+		}
+
+		const updatedItem = await prisma.item.update({
+			where: {
+				id,
+			},
+			data: {
+				name,
+				price: Number.parseFloat(price),
+				quantity: Number.parseInt(initial_available_quantity),
+			},
+		})
+
+		return NextResponse.json(
+			{ message: 'Item updated successfully', item: updatedItem },
+			{ status: 200 }
+		)
+	} catch (e) {
+		console.log(e)
+
+		return NextResponse.json(
+			{ message: 'Error updating item', error: e },
+			{ status: 500 }
+		)
+	}
+}
+
 export async function DELETE(req: NextRequest) {
 	try {
 		const { id } = await req.json()

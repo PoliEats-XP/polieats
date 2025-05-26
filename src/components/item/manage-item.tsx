@@ -11,6 +11,8 @@ import { ItemForm } from './item-form'
 import type { z } from 'zod'
 import type { itemFormSchema } from '@/lib/schemas/menu.schemas'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '../ui/drawer'
+import { updateItemMutation } from '@/utils/mutations'
+import { useQueryClient } from '@tanstack/react-query'
 
 type ManageItemProps = {
 	open?: boolean
@@ -32,6 +34,7 @@ export function ManageItem({
 	const [isDesktop, setIsDesktop] = useState<boolean | null>(null)
 	const isMounted = useIsMounted()
 	const mediaQueryResult = useMediaQuery('(min-width: 768px)')
+	const queryClient = useQueryClient()
 
 	useEffect(() => {
 		if (isMounted()) {
@@ -39,7 +42,29 @@ export function ManageItem({
 		}
 	}, [mediaQueryResult, isMounted])
 
-	async function onSubmit(values: z.infer<typeof itemFormSchema>) {}
+	const { updateMutation } = updateItemMutation(queryClient, onOpenChange)
+
+	async function onSubmit(values: z.infer<typeof itemFormSchema>) {
+		// Check if any values have changed
+		const hasChanges =
+			values.name !== item_name ||
+			Number(values.price) !== item_price ||
+			Number(values.initial_available_quantity) !== item_available_quantity
+
+		if (!hasChanges) {
+			// No changes detected, just close the dialog
+			onOpenChange?.(false)
+			return
+		}
+
+		// Include the ID in the values for the update
+		const updateValues = {
+			...values,
+			id: item_id,
+		}
+
+		return updateMutation.mutate(updateValues)
+	}
 
 	if (isDesktop) {
 		return (
@@ -60,6 +85,12 @@ export function ManageItem({
 						item_name={item_name}
 						item_available_quantity={item_available_quantity}
 						onOpenChange={onOpenChange}
+						isManaging={true}
+						originalValues={{
+							name: item_name,
+							price: item_price,
+							initial_available_quantity: item_available_quantity,
+						}}
 					/>
 				</DialogContent>
 			</Dialog>
@@ -89,6 +120,12 @@ export function ManageItem({
 						item_name={item_name}
 						item_available_quantity={item_available_quantity}
 						onOpenChange={onOpenChange}
+						isManaging={true}
+						originalValues={{
+							name: item_name,
+							price: item_price,
+							initial_available_quantity: item_available_quantity,
+						}}
 					/>
 				</DrawerContent>
 			</div>

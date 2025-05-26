@@ -1,6 +1,7 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -31,6 +32,8 @@ async function fetchOrderStats(): Promise<OrderStats> {
 }
 
 export function OrdersStats() {
+	const queryClient = useQueryClient()
+
 	const {
 		data: stats,
 		isLoading,
@@ -38,8 +41,33 @@ export function OrdersStats() {
 	} = useQuery({
 		queryKey: ['admin-order-stats'],
 		queryFn: fetchOrderStats,
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		staleTime: 1000 * 60 * 2, // 2 minutes - reduced for more frequent updates
 	})
+
+	// Listen for order updates and provide optimistic updates
+	useEffect(() => {
+		// Listen for order detail updates (which happen when order status is changed)
+		const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+			if (
+				event.type === 'updated' &&
+				event.query.queryKey[0] === 'admin-order-details'
+			) {
+				// Invalidate stats when an order is updated
+				queryClient.invalidateQueries({ queryKey: ['admin-order-stats'] })
+			}
+
+			// Also listen for order list updates
+			if (
+				event.type === 'updated' &&
+				event.query.queryKey[0] === 'admin-orders'
+			) {
+				// Invalidate stats when orders list is updated
+				queryClient.invalidateQueries({ queryKey: ['admin-order-stats'] })
+			}
+		})
+
+		return unsubscribe
+	}, [queryClient])
 
 	if (isLoading) {
 		return (
