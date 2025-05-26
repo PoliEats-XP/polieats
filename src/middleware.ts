@@ -50,7 +50,7 @@ export default async function authMiddleware(req: NextRequest) {
 		return NextResponse.redirect(new URL('/dashboard', req.url))
 	}
 
-	if (session && role === 'admin' && isAdminRoute) {
+	if ((session && role === 'admin') || (role === 'master' && isAdminRoute)) {
 		return NextResponse.next()
 	}
 

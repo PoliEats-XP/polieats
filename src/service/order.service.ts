@@ -37,6 +37,17 @@ export class OrderService {
 				)
 				console.log(`Order status: ${existingOrder.status}`)
 
+				// Check if the existing order has any items
+				const orderWithItems = await OrderRepository.getOrderById(
+					existingOrder.id
+				)
+				const hasItems =
+					orderWithItems?.items && orderWithItems.items.length > 0
+
+				console.log(
+					`Existing order has ${orderWithItems?.items?.length || 0} items`
+				)
+
 				// If order exists and is confirmed, either keep it or create new based on param
 				if (existingOrder.status === 'COMPLETED' && resetIfCompleted) {
 					console.log('Creating new order because existing one is completed')
@@ -46,7 +57,18 @@ export class OrderService {
 					return
 				}
 
-				// For all existing orders (including COMPLETED if resetIfCompleted=false), use them
+				// If order is PENDING but has no items (was cleared), create a new order
+				if (existingOrder.status === 'PENDING' && !hasItems) {
+					console.log(
+						'Creating new order because existing PENDING order has no items (was cleared)'
+					)
+					const newOrder = await OrderRepository.createOrder(this.userId)
+					this.orderId = newOrder.id
+					console.log('New order created with ID:', this.orderId)
+					return
+				}
+
+				// For all other existing orders, use them
 				console.log(`Using existing ${existingOrder.status} order`)
 				this.orderId = existingOrder.id
 				return
@@ -103,6 +125,8 @@ export class OrderService {
 			await OrderRepository.clearOrder(this.orderId)
 			await OrderRepository.calculateOrderTotal(this.orderId)
 			console.log('Order cleared.')
+			// Reset the orderId so a new order will be created next time
+			this.orderId = null
 		}
 	}
 

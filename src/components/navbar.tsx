@@ -8,7 +8,7 @@ import { ThemeSwitcher } from './theme-switcher'
 import { AvatarDropdown } from './avatar-dropdown'
 
 export type NavbarProps = {
-	variant?: 'default' | 'admin'
+	variant?: 'default' | 'admin' | 'master'
 	activeLink?: 'orders' | 'menu'
 }
 

@@ -108,8 +108,18 @@ export async function POST(req: NextRequest) {
 					console.log('Using existing completed order to update payment method')
 				}
 			} else {
-				// Use existing pending order, or if user mentions payment method, ensure order is initialized
-				if (mentionsPaymentMethod || existingOrder.status === 'PENDING') {
+				// For PENDING orders, check if they have items or if user is trying to add items
+				const mightBeAddingItems =
+					lastUserMessage.includes('quero') ||
+					lastUserMessage.includes('pedir') ||
+					lastUserMessage.includes('adicionar') ||
+					extractItemsWithQuantity(lastUserMessage, MENU).length > 0
+
+				if (
+					mightBeAddingItems ||
+					mentionsPaymentMethod ||
+					existingOrder.status === 'PENDING'
+				) {
 					await orderService.initializeOrder(false)
 					console.log(
 						'Using existing order for payment method or pending status'
@@ -128,8 +138,29 @@ export async function POST(req: NextRequest) {
 		// Only get order summary if order is initialized
 		try {
 			orderSummary = await orderService.getOrderSummary()
+			console.log('Retrieved order summary:', orderSummary)
 		} catch (error) {
 			console.log('Order not initialized yet, using default summary')
+			// If order is not initialized but user is trying to add items, initialize it
+			const mightBeAddingItems =
+				lastUserMessage.includes('quero') ||
+				lastUserMessage.includes('pedir') ||
+				lastUserMessage.includes('adicionar') ||
+				extractItemsWithQuantity(lastUserMessage, MENU).length > 0
+
+			if (mightBeAddingItems) {
+				console.log('Initializing order because user is trying to add items')
+				await orderService.initializeOrder(true)
+				try {
+					orderSummary = await orderService.getOrderSummary()
+					console.log(
+						'Retrieved order summary after initialization:',
+						orderSummary
+					)
+				} catch (retryError) {
+					console.log('Still could not get order summary after initialization')
+				}
+			}
 		}
 		// console.log('Order summary result:', orderSummary)
 
@@ -177,11 +208,33 @@ export async function POST(req: NextRequest) {
 
 		//pedido foi cancelado
 		if (hasSpecialCommand(aiResponse, 'pedidoCancelado')) {
-			if (Object.keys(orderService.getCurrentOrder()).length === 0) {
+			try {
+				const currentOrder = await orderService.getCurrentOrder()
+				if (Object.keys(currentOrder.items).length === 0) {
+					return jsonResponse('error', ERROR_MESSAGES.INVALID_REQUEST)
+				}
+				await orderService.clearOrder()
+
+				// Return success response with cleared order state
+				return NextResponse.json({
+					status: 'success',
+					message: ERROR_MESSAGES.ORDER_CANCELLED,
+					currentOrder: {
+						items: {},
+						total: 0,
+						paymentMethod: null,
+						status: 'PENDING',
+					},
+					total: 0,
+					orderSummary: 'Nenhum item no pedido.',
+					orderConfirmed: false,
+					paymentMethod: null,
+					orderCancelled: true,
+				})
+			} catch (error) {
+				console.log('Error during order cancellation:', error)
 				return jsonResponse('error', ERROR_MESSAGES.INVALID_REQUEST)
 			}
-			orderService.clearOrder()
-			return jsonResponse('error', ERROR_MESSAGES.ORDER_CANCELLED)
 		}
 
 		// Processa múltiplos comandos na mesma resposta ou pedidos unicos de remoção/adição
@@ -320,6 +373,7 @@ export async function POST(req: NextRequest) {
 		let updatedOrderSummary = 'Nenhum item no pedido.'
 		try {
 			updatedOrderSummary = await orderService.getOrderSummary()
+			console.log('Final updated order summary:', updatedOrderSummary)
 		} catch (error) {
 			console.log('Could not get updated order summary')
 		}

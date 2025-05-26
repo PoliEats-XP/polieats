@@ -1,10 +1,24 @@
 import { Button } from '@/components/ui/button'
-import type { Order } from '@/types'
+// Define the actual order structure being used
+interface OrderItem {
+	name: string
+	price: number
+	quantity: number
+}
+
+interface ActualOrder {
+	id: string
+	status: 'PENDING' | 'COMPLETED' | 'CANCELED'
+	date: string
+	total: number
+	item: OrderItem[]
+}
 
 interface OrderProps {
 	handleOpenConfirmation: () => void
 	setOpen: (open: boolean) => void
 	component: 'drawer' | 'dialog'
+	order: ActualOrder
 }
 
 export function OrderDetailsDrawerFooter({
@@ -12,7 +26,7 @@ export function OrderDetailsDrawerFooter({
 	handleOpenConfirmation,
 	setOpen,
 	component,
-}: OrderProps & Order) {
+}: OrderProps) {
 	return (
 		<>
 			{order.status === 'PENDING' ? (

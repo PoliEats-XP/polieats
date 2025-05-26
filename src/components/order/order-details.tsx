@@ -16,14 +16,33 @@ import {
 } from '../ui/drawer'
 import { OrderDetailsDrawerFooter } from './ui/details-footer'
 import { DetailsItems } from './ui/details-items'
-import type { Order } from '@/types'
+import { generateOrderNumber } from '@/lib/utils'
+// Define the actual order structure being used
+interface OrderItem {
+	name: string
+	price: number
+	quantity: number
+}
 
-export function OrderDetails({ order }: Order) {
+interface ActualOrder {
+	id: string
+	status: 'PENDING' | 'COMPLETED' | 'CANCELED'
+	date: string
+	total: number
+	item: OrderItem[]
+}
+
+interface OrderDetailsProps {
+	order: ActualOrder
+}
+
+export function OrderDetails({ order }: OrderDetailsProps) {
 	const [open, setOpen] = useState(false)
 	const [openConfirmation, setOpenConfirmation] = useState(false)
 	const [isDesktop, setIsDesktop] = useState<boolean | null>(null)
 	const isMounted = useIsMounted()
 	const mediaQueryResult = useMediaQuery('(min-width: 768px)')
+	const orderNumber = generateOrderNumber(order.id)
 	useEffect(() => {
 		if (isMounted()) {
 			setIsDesktop(mediaQueryResult)
@@ -63,7 +82,7 @@ export function OrderDetails({ order }: Order) {
 						<DialogHeader className="flex flex-col gap-1 text-2xl font-medium">
 							Detalhes do Pedido
 							<p className="text-lg font-light text-black dark:text-white -mt-2">
-								Confira alguns detalhes do Pedido {order.id}
+								Confira alguns detalhes do Pedido #{orderNumber}
 							</p>
 							<OrderStatusBadge className="mt-3" status={order.status} />
 						</DialogHeader>
@@ -98,7 +117,7 @@ export function OrderDetails({ order }: Order) {
 				<DrawerHeader className="flex flex-col gap-1 text-2xl font-medium">
 					Detalhes do Pedido
 					<p className="text-lg font-light text-black dark:text-white -mt-2">
-						Confira alguns detalhes do Pedido {order.id}
+						Confira alguns detalhes do Pedido #{orderNumber}
 					</p>
 					<OrderStatusBadge className="mt-3" status={order.status} />
 				</DrawerHeader>
