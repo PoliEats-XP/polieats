@@ -1,4 +1,4 @@
-import { type ChangeEvent, useState } from 'react'
+import { type ChangeEvent, type InputHTMLAttributes, useState } from 'react'
 import { Input } from './ui/input'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
@@ -8,7 +8,7 @@ interface IconProps {
 	className?: string
 }
 
-interface IconInputProps {
+interface IconInputProps extends InputHTMLAttributes<HTMLInputElement> {
 	placeholder?: string
 	inputValue?: string | number
 	onChange?: (value: ChangeEvent<HTMLInputElement> | number | string) => void
@@ -28,6 +28,7 @@ export function IconInput({
 	disabled,
 	LeftIcon,
 	leftIconSize = 6,
+	...props
 }: IconInputProps) {
 	const [value, setValue] = useState(inputValue || '')
 	const [showPassword, setShowPassword] = useState(false)
@@ -72,6 +73,7 @@ export function IconInput({
 					className
 				)}
 				disabled={disabled}
+				{...props}
 			/>
 			{inputType === 'password' && (
 				<Button

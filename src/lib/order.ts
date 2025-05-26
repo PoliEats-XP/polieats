@@ -1,4 +1,5 @@
 import { prisma } from './prisma'
+import { Prisma } from '@prisma/client'
 
 interface OrderUpsert {
 	where: {
@@ -17,12 +18,25 @@ interface OrderUpsert {
 	}
 }
 
+type PaymentMethod =
+	| 'CASH'
+	| 'CREDIT_CARD'
+	| 'DEBIT_CARD'
+	| 'PIX'
+	| 'INDEFINIDO'
+
 export class OrderRepository {
 	// validação(banco) para ver se Order existe
 	private static async getValidatedOrder(orderId: string, status?: string) {
 		const order = await prisma.order.findUnique({
 			where: { id: orderId },
-			include: { items: true },
+			include: {
+				items: {
+					include: {
+						item: true,
+					},
+				},
+			},
 		})
 
 		if (!order) {
@@ -30,6 +44,14 @@ export class OrderRepository {
 		}
 
 		if (status && order.status !== status) {
+			console.log('order.status', order.status)
+
+			// For read operations, don't throw an error for COMPLETED orders
+			if (order.status === 'COMPLETED' && !status.includes('WRITE_OPERATION')) {
+				console.log('Order is COMPLETED but allowing read operation')
+				return order
+			}
+
 			throw new Error(`Order must be in ${status} status.`)
 		}
 
@@ -48,12 +70,31 @@ export class OrderRepository {
 
 	//Pegar a order pelo orderId
 	static async getOrderById(orderId: string) {
-		await this.getValidatedOrder(orderId, 'PENDING')
+		await this.getValidatedOrder(orderId)
 
-		return await prisma.order.findUnique({
+		console.log('Fetching order with ID:', orderId)
+		const order = await prisma.order.findUnique({
 			where: { id: orderId },
-			include: { items: true },
+			include: {
+				items: {
+					include: {
+						item: true,
+					},
+				},
+			},
 		})
+		console.log('Raw order from database:', JSON.stringify(order, null, 2))
+		console.log(
+			'Order items:',
+			order?.items?.map((item) => ({
+				id: item.id,
+				itemId: item.itemId,
+				name: item.name,
+				quantity: item.quantity,
+				price: item.price,
+			}))
+		)
+		return order
 	}
 
 	//Atualizar a quantidade dos items da order
@@ -64,19 +105,77 @@ export class OrderRepository {
 	) {
 		await this.getValidatedOrder(orderId, 'PENDING')
 
-		return await prisma.orderItem.upsert<OrderUpsert>({
+		console.log('Looking for item with ID:', itemId)
+		let item = await prisma.item.findUnique({
+			where: { id: itemId },
+		})
+		console.log('Found item:', item)
+
+		if (!item) {
+			// Try to find the item by name as a fallback
+			console.log('Item not found by ID, trying to find by name...')
+			const items = await prisma.item.findMany({
+				where: {
+					name: itemId,
+				},
+			})
+			console.log('Found items by name:', items)
+
+			if (items.length === 0) {
+				throw new Error('Item not found')
+			}
+			item = items[0]
+		}
+
+		// Check if the requested quantity is available
+		if (quantity > item.quantity) {
+			throw new Error(
+				`Insufficient inventory. Available: ${item.quantity}, Requested: ${quantity}`
+			)
+		}
+
+		console.log('Updating item quantity:', {
+			orderId,
+			itemId,
+			quantity,
+			itemPrice: item.price,
+			itemName: item.name,
+			availableQuantity: item.quantity,
+		})
+
+		// First try to find existing order item
+		const existingOrderItem = await prisma.orderItem.findFirst({
 			where: {
-				orderId_itemId: { orderId, itemId },
-			},
-			update: {
-				quantity: quantity,
-			},
-			create: {
 				orderId: orderId,
 				itemId: itemId,
-				quantity: quantity,
 			},
 		})
+
+		if (existingOrderItem) {
+			console.log('Updating existing order item:', existingOrderItem)
+			const updated = await prisma.orderItem.update({
+				where: { id: existingOrderItem.id },
+				data: {
+					quantity,
+					price: item.price, // Ensure price comes from the item definition
+				},
+			})
+			console.log('Updated order item:', updated)
+			return updated
+		}
+
+		console.log('Creating new order item with price:', item.price)
+		const created = await prisma.orderItem.create({
+			data: {
+				orderId,
+				itemId,
+				quantity,
+				name: item.name,
+				price: item.price, // Ensure price comes from the item definition
+			},
+		})
+		console.log('Created new order item:', created)
+		return created
 	}
 
 	//Limpar(deletar) todos os items da order
@@ -108,21 +207,99 @@ export class OrderRepository {
 	}
 
 	//Define o método de pagamento e o status da order como confirmed
-	static async confirmOrder(orderId: string, paymentMethod: string) {
-		await this.getValidatedOrder(orderId, 'PENDING')
-
-		return await prisma.order.update({
+	static async confirmOrder(orderId: string, paymentMethod: PaymentMethod) {
+		const order = await prisma.order.findUnique({
 			where: { id: orderId },
-			data: {
-				status: 'CONFIRMED',
-				paymentMethod: paymentMethod,
+			include: {
+				items: {
+					include: { item: true },
+				},
 			},
 		})
+
+		if (!order) {
+			throw new Error('Order not found')
+		}
+
+		console.log(
+			`Confirming order ${orderId} with payment method ${paymentMethod}`
+		)
+		console.log('Items to preserve:', JSON.stringify(order.items, null, 2))
+
+		// Check if order has items
+		if (!order.items || order.items.length === 0) {
+			console.warn('WARNING: Confirming order with no items!')
+		}
+
+		// Keep track of the current order status
+		const currentStatus = order.status
+		console.log(`Current order status before confirmation: ${currentStatus}`)
+
+		// Only update to COMPLETED if not already completed
+		if (currentStatus === 'COMPLETED') {
+			console.log('Order is already completed, only updating payment method')
+			return await prisma.order.update({
+				where: { id: orderId },
+				data: {
+					paymentMethod: paymentMethod,
+				},
+				include: {
+					items: {
+						include: { item: true },
+					},
+				},
+			})
+		}
+
+		// Check inventory availability before confirming
+		for (const orderItem of order.items) {
+			if (orderItem.item && orderItem.quantity > orderItem.item.quantity) {
+				throw new Error(
+					`Insufficient inventory for ${orderItem.name}. Available: ${orderItem.item.quantity}, Requested: ${orderItem.quantity}`
+				)
+			}
+		}
+
+		// Use a transaction to ensure inventory updates and order confirmation happen together
+		const result = await prisma.$transaction(async (prisma) => {
+			// Subtract quantities from inventory
+			for (const orderItem of order.items) {
+				if (orderItem.item) {
+					await prisma.item.update({
+						where: { id: orderItem.item.id },
+						data: {
+							quantity: orderItem.item.quantity - orderItem.quantity,
+						},
+					})
+					console.log(
+						`Subtracted ${orderItem.quantity} from item ${orderItem.name}. New quantity: ${orderItem.item.quantity - orderItem.quantity}`
+					)
+				}
+			}
+
+			// Set the order as COMPLETED
+			return await prisma.order.update({
+				where: { id: orderId },
+				data: {
+					status: 'COMPLETED',
+					paymentMethod: paymentMethod,
+				},
+				include: {
+					items: {
+						include: { item: true },
+					},
+				},
+			})
+		})
+
+		console.log('Order confirmed and inventory updated successfully')
+		return result
 	}
 
 	//Pega a grande parte dos status da order
 	static async orderStatus(orderId: string) {
-		await this.getValidatedOrder(orderId, 'PENDING')
+		// Allow getting status from both PENDING and COMPLETED orders
+		await this.getValidatedOrder(orderId)
 
 		return await prisma.order.findUnique({
 			where: { id: orderId },
@@ -142,46 +319,109 @@ export class OrderRepository {
 	//Define o método de pagamento
 	static async setPaymentMethod(
 		orderId: string,
-		paymentMethod: string
+		paymentMethod: PaymentMethod
 	): Promise<void> {
-		await this.getValidatedOrder(orderId, 'PENDING')
+		// Allow setting payment method on both PENDING and COMPLETED orders
+		await this.getValidatedOrder(orderId)
 
-		await prisma.order.update({
+		console.log(`Setting payment method ${paymentMethod} for order ${orderId}`)
+
+		const result = await prisma.order.update({
 			where: { id: orderId },
 			data: {
 				paymentMethod: paymentMethod,
 			},
 		})
+
+		console.log('Payment method set successfully. Updated order:', {
+			id: result.id,
+			paymentMethod: result.paymentMethod,
+			status: result.status,
+		})
 	}
 
 	//Calcula o total da order
 	static async calculateOrderTotal(orderId: string): Promise<number> {
-		await this.getValidatedOrder(orderId, 'PENDING')
+		// Use status check without strict validation for completed orders
+		await this.getValidatedOrder(orderId)
 
 		const order = await prisma.order.findUnique({
 			where: { id: orderId },
-			include: { items: { include: { item: true } } },
+			include: {
+				items: true, // Include only the OrderItems
+			},
 		})
 
-		const total = order.items.reduce(
-			(sum: number, item: { quantity: number; item: { price: number } }) =>
-				sum + item.quantity * item.item.price,
-			0
+		if (!order) {
+			throw new Error('Order not found')
+		}
+
+		console.log(
+			'Calculating total for order items:',
+			order.items.map((item) => ({
+				id: item.id,
+				name: item.name,
+				quantity: item.quantity,
+				price: item.price,
+				lineTotal: Number(item.price) * item.quantity,
+			}))
 		)
 
-		await prisma.order.update({
-			where: { id: orderId },
-			data: { totalPrice: total },
-		})
+		// Calculate total directly from orderItems without item relationship
+		const total = order.items.reduce((sum, orderItem) => {
+			const itemPrice = Number(orderItem.price)
+			const itemTotal = itemPrice * orderItem.quantity
+			console.log(
+				`Item ${orderItem.name}: ${orderItem.quantity} x ${itemPrice} = ${itemTotal}`
+			)
+			return sum + itemTotal
+		}, 0)
+
+		console.log(`Calculated order total: ${total}`)
+
+		// Only update the total if the order is still PENDING
+		if (order.status === 'PENDING') {
+			await prisma.order.update({
+				where: { id: orderId },
+				data: { totalPrice: total },
+			})
+		}
 
 		return total
 	}
 
 	//Pega o total da order
 	static async getTotalValue(orderId: string): Promise<number> {
-		return await prisma.order.findUnique({
+		const order = await prisma.order.findUnique({
 			where: { id: orderId },
-			include: { totalPrice: true },
+			select: { totalPrice: true },
 		})
+
+		if (!order) {
+			throw new Error('Order not found')
+		}
+
+		return Number(order.totalPrice)
+	}
+
+	// Find order by user ID
+	static async findOrderByUserId(userId: string) {
+		const order = await prisma.order.findFirst({
+			where: {
+				userId: userId,
+				// Optionally prioritize PENDING orders
+				OR: [{ status: 'PENDING' }, { status: 'COMPLETED' }],
+			},
+			orderBy: {
+				// Most recent first
+				updatedAt: 'desc',
+			},
+			include: {
+				items: {
+					include: { item: true },
+				},
+			},
+		})
+		return order
 	}
 }

@@ -1,16 +1,18 @@
 export interface MenuItem {
-	id: number
+	id: string
 	nome: string
 }
 
 export interface OrderItem {
-	id: number
+	id: string
 	quant: number
 	name: string
+	price?: string | number
 }
 
 export interface Order {
-	items: Record<number, OrderItem>
+	items: Record<string, OrderItem>
 	total: number
 	paymentMethod: string | null
+	status?: string
 }

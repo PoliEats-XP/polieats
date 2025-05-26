@@ -1,6 +1,7 @@
 import { EmailVerificationBanner } from '@/components/email-verification-banner'
 import { Navbar } from '@/components/navbar'
-import { OrderCard } from '@/components/order/order-card'
+import { OrdersTable } from '@/components/admin/orders-table'
+import { OrdersStats } from '@/components/admin/orders-stats'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -9,30 +10,27 @@ export const metadata: Metadata = {
 }
 
 export default function Dashboard() {
-	const testOrder: {
-		id: string
-		status: 'PENDING' | 'COMPLETED' | 'CANCELED'
-		date: string
-		total: number
-		items: { name: string; price: number; quantity: number }[]
-	} = {
-		id: '12345',
-		date: '2023-10-01',
-		status: 'PENDING',
-		total: 100.0,
-		items: [
-			{ name: 'Item 1', price: 15, quantity: 2 },
-			{ name: 'Item 2', price: 8, quantity: 1 },
-		],
-	}
-
 	return (
 		<>
 			<EmailVerificationBanner />
 
 			<Navbar variant="admin" />
 
-			<OrderCard order={testOrder} />
+			<div className="container mx-auto p-6">
+				<div className="mb-8">
+					<h1 className="text-3xl font-bold tracking-tight">
+						Dashboard Administrativo
+					</h1>
+					<p className="text-muted-foreground">
+						Gerencie todos os pedidos do sistema
+					</p>
+				</div>
+
+				<div className="space-y-8">
+					<OrdersStats />
+					<OrdersTable />
+				</div>
+			</div>
 		</>
 	)
 }

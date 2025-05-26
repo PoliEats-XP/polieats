@@ -75,3 +75,20 @@ export function deleteItemMutation(
 
 	return { deleteMutation }
 }
+
+// New mutation for refreshing orders when an order is completed
+export function useOrderCompletedMutation(queryClient: QueryClient) {
+	const orderCompletedMutation = useMutation({
+		mutationFn: async () => {
+			// This is just a trigger function - the actual order completion happens in the chatbot API
+			// We just need to invalidate the orders cache to refetch the latest data
+			return Promise.resolve()
+		},
+		onSuccess: () => {
+			// Invalidate and refetch orders
+			queryClient.invalidateQueries({ queryKey: ['orders'] })
+		},
+	})
+
+	return { orderCompletedMutation }
+}
