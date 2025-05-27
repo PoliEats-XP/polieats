@@ -72,7 +72,7 @@ export async function GET(
 				name: order.user.name,
 				email: order.user.email,
 			},
-			itemCount: order.items.length,
+			itemCount: order.items.reduce((total, item) => total + item.quantity, 0),
 			items: order.items.map((orderItem) => ({
 				name: orderItem.name,
 				price: Number(orderItem.price),
@@ -170,7 +170,10 @@ export async function PATCH(
 				name: updatedOrder.user.name,
 				email: updatedOrder.user.email,
 			},
-			itemCount: updatedOrder.items.length,
+			itemCount: updatedOrder.items.reduce(
+				(total, item) => total + item.quantity,
+				0
+			),
 			items: updatedOrder.items.map((orderItem) => ({
 				name: orderItem.name,
 				price: Number(orderItem.price),
