@@ -22,11 +22,16 @@ export default async function authMiddleware(req: NextRequest) {
 		}
 	)
 
+	// Master role has unrestricted access to all pages
+	if (session && session.user.role === 'master') {
+		return NextResponse.next()
+	}
+
+	// No session - redirect to login unless already on auth route
 	if (!session) {
 		if (isAuthRoute) {
 			return NextResponse.next()
 		}
-
 		return NextResponse.redirect(new URL('/login', req.url))
 	}
 
@@ -34,31 +39,44 @@ export default async function authMiddleware(req: NextRequest) {
 
 	console.log('role:', role)
 
-	if (!session && isAuthenticatedRoute) {
-		return NextResponse.redirect(new URL('/login', req.url))
+	// Admin role logic
+	if (role === 'admin') {
+		// Admin trying to access user routes - redirect to dashboard
+		if (isAuthenticatedRoute) {
+			return NextResponse.redirect(new URL('/dashboard', req.url))
+		}
+		// Admin trying to access auth routes - redirect to dashboard
+		if (isAuthRoute) {
+			return NextResponse.redirect(new URL('/dashboard', req.url))
+		}
+		// Admin accessing admin routes - allow
+		if (isAdminRoute) {
+			return NextResponse.next()
+		}
 	}
 
-	if (session && role === 'admin' && isAuthenticatedRoute) {
-		return NextResponse.redirect(new URL('/dashboard', req.url))
+	// Regular user logic
+	if (role !== 'admin') {
+		// User trying to access auth routes - redirect to home
+		if (isAuthRoute) {
+			return NextResponse.redirect(new URL('/', req.url))
+		}
+		// User trying to access admin routes - redirect to home
+		if (isAdminRoute) {
+			return NextResponse.redirect(new URL('/', req.url))
+		}
+		// User accessing user routes - allow
+		if (isAuthenticatedRoute) {
+			return NextResponse.next()
+		}
 	}
 
-	if (session && role !== 'admin' && isAuthRoute) {
-		return NextResponse.redirect(new URL('/', req.url))
-	}
-
-	if (session && role === 'admin' && isAuthRoute) {
-		return NextResponse.redirect(new URL('/dashboard', req.url))
-	}
-
-	if ((session && role === 'admin') || (role === 'master' && isAdminRoute)) {
-		return NextResponse.next()
-	}
-
-	if (session && role !== 'admin' && isAdminRoute) {
-		return NextResponse.redirect(new URL('/', req.url))
-	}
+	// Default allow
+	return NextResponse.next()
 }
 
 export const config = {
-	matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+	matcher: [
+		'/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.ico$|.*\\.webp$).*)',
+	],
 }

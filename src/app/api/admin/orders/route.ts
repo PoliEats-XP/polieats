@@ -94,12 +94,15 @@ export async function GET(request: NextRequest) {
 				name: order.user.name,
 				email: order.user.email,
 			},
-			itemCount: order.items.length,
+			itemCount: order.items.reduce((total, item) => total + item.quantity, 0),
 			items: order.items.map((orderItem) => ({
 				name: orderItem.name,
 				price: Number(orderItem.price),
 				quantity: orderItem.quantity,
 			})),
+			rating: order.rating,
+			feedback: order.feedback,
+			feedbackAt: order.feedbackAt?.toISOString(),
 		}))
 
 		const hasMore = offset + orders.length < totalOrders

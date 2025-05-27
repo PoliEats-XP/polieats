@@ -20,10 +20,19 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { User, Calendar, CreditCard, Package, Wallet, Save } from 'lucide-react'
+import {
+	User,
+	Calendar,
+	CreditCard,
+	Package,
+	Wallet,
+	Save,
+	Star,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import type { AdminOrder } from '@/types/admin'
 import { useOrderStats } from '@/hooks/use-order-stats'
+import { StarRating } from '@/components/ui/star-rating'
 
 interface OrderDetailsModalProps {
 	orderId: string | null
@@ -357,6 +366,42 @@ export function OrderDetailsModal({
 								</div>
 							</CardContent>
 						</Card>
+
+						{/* Customer Feedback */}
+						{order.rating !== null && order.rating !== undefined && (
+							<Card>
+								<CardHeader>
+									<CardTitle className="flex items-center space-x-2">
+										<Star className="w-5 h-5" />
+										<span>Avaliação do Cliente</span>
+									</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<div className="space-y-3">
+										<div>
+											<p className="text-sm font-medium mb-2">Classificação:</p>
+											<StarRating rating={order.rating} readonly size="md" />
+										</div>
+										{order.feedback && (
+											<div>
+												<p className="text-sm font-medium mb-2">Comentário:</p>
+												<p className="text-sm text-muted-foreground italic bg-muted/50 p-3 rounded-md">
+													"{order.feedback}"
+												</p>
+											</div>
+										)}
+										{order.feedbackAt && (
+											<div>
+												<p className="text-xs text-muted-foreground">
+													Avaliado em{' '}
+													{new Date(order.feedbackAt).toLocaleString('pt-BR')}
+												</p>
+											</div>
+										)}
+									</div>
+								</CardContent>
+							</Card>
+						)}
 					</div>
 				) : null}
 			</DialogContent>

@@ -22,7 +22,7 @@ export default function ResetPassword() {
 		<div className="flex flex-col items-center justify-center h-screen p-4 md:p-0 max-w-md mx-auto">
 			<AuthHero />
 
-			<p className="text-lg text-midgray font-light mb-6 text-center">
+			<p className="text-base text-muted-foreground font-light mb-6 text-center">
 				Redefina sua senha para acessar sua conta
 			</p>
 

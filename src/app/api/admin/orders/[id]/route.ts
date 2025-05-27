@@ -72,12 +72,15 @@ export async function GET(
 				name: order.user.name,
 				email: order.user.email,
 			},
-			itemCount: order.items.length,
+			itemCount: order.items.reduce((total, item) => total + item.quantity, 0),
 			items: order.items.map((orderItem) => ({
 				name: orderItem.name,
 				price: Number(orderItem.price),
 				quantity: orderItem.quantity,
 			})),
+			rating: order.rating,
+			feedback: order.feedback,
+			feedbackAt: order.feedbackAt?.toISOString(),
 		}
 
 		return NextResponse.json(transformedOrder)
@@ -170,12 +173,18 @@ export async function PATCH(
 				name: updatedOrder.user.name,
 				email: updatedOrder.user.email,
 			},
-			itemCount: updatedOrder.items.length,
+			itemCount: updatedOrder.items.reduce(
+				(total, item) => total + item.quantity,
+				0
+			),
 			items: updatedOrder.items.map((orderItem) => ({
 				name: orderItem.name,
 				price: Number(orderItem.price),
 				quantity: orderItem.quantity,
 			})),
+			rating: updatedOrder.rating,
+			feedback: updatedOrder.feedback,
+			feedbackAt: updatedOrder.feedbackAt?.toISOString(),
 		}
 
 		return NextResponse.json(transformedOrder)
