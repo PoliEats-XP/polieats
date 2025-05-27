@@ -10,16 +10,18 @@ export const metadata: Metadata = {
 
 export default function Login() {
 	return (
-		<div className="flex flex-col items-center justify-center h-screen p-4 md:p-0 max-w-md mx-auto">
+		<div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 max-w-md mx-auto">
 			<CookieConsent variant="small" />
 
-			<AuthHero />
+			<div className="flex flex-col items-center justify-center flex-1 w-full py-8">
+				<AuthHero />
 
-			<p className="text-lg text-midgray font-light mb-6">
-				Bem-vindo de volta, faça login para continuar
-			</p>
+				<p className="text-base text-muted-foreground font-light mb-6 text-center">
+					Bem-vindo de volta, faça login para continuar
+				</p>
 
-			<Form />
+				<Form />
+			</div>
 		</div>
 	)
 }

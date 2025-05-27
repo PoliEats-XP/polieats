@@ -69,6 +69,9 @@ export async function GET(request: NextRequest) {
 				price: Number(orderItem.price),
 				quantity: orderItem.quantity,
 			})),
+			rating: order.rating,
+			feedback: order.feedback,
+			feedbackAt: order.feedbackAt?.toISOString(),
 		}))
 
 		const hasMore = offset + orders.length < totalOrders

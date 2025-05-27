@@ -92,6 +92,11 @@ model Order {
   items         OrderItem[]
   paymentMethod PaymentMethod?
 
+  // Feedback fields
+  rating     Int? // 0-5 stars, null if no feedback given
+  feedback   String? // Optional feedback comment
+  feedbackAt DateTime? // When feedback was submitted
+
   @@map("order")
 }
 

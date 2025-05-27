@@ -17,6 +17,9 @@ interface Order {
 	date: string
 	total: number
 	item: OrderItem[]
+	rating?: number | null
+	feedback?: string | null
+	feedbackAt?: string | null
 }
 
 interface OrdersResponse {

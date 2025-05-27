@@ -78,6 +78,9 @@ export async function GET(
 				price: Number(orderItem.price),
 				quantity: orderItem.quantity,
 			})),
+			rating: order.rating,
+			feedback: order.feedback,
+			feedbackAt: order.feedbackAt?.toISOString(),
 		}
 
 		return NextResponse.json(transformedOrder)
@@ -179,6 +182,9 @@ export async function PATCH(
 				price: Number(orderItem.price),
 				quantity: orderItem.quantity,
 			})),
+			rating: updatedOrder.rating,
+			feedback: updatedOrder.feedback,
+			feedbackAt: updatedOrder.feedbackAt?.toISOString(),
 		}
 
 		return NextResponse.json(transformedOrder)

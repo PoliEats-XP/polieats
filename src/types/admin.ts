@@ -23,6 +23,9 @@ export interface AdminOrder {
 	}
 	itemCount: number
 	items: AdminOrderItem[]
+	rating?: number | null
+	feedback?: string | null
+	feedbackAt?: string | null
 }
 
 export interface AdminOrdersResponse {
