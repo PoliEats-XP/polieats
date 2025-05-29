@@ -253,6 +253,8 @@ export function Chatbot() {
 		setInputValue('')
 		setIsTyping(false)
 		inputRef.current?.focus()
+
+		console.log('orderState', orderState)
 	}
 
 	// Typing indicator component
@@ -507,18 +509,16 @@ export function Chatbot() {
 
 						{/* Show order status */}
 						<div className="flex items-center justify-between">
-							<span className="text-xs font-medium text-muted-foreground">
-								Status:
-							</span>
-							<span
-								className={`text-xs px-2 py-1 rounded-full border ${
-									orderState.orderConfirmed
-										? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'
-										: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-								}`}
-							>
-								{orderState.orderConfirmed ? 'Confirmado' : 'Pendente'}
-							</span>
+							{orderState.orderConfirmed ?? (
+								<>
+									<span className="text-xs font-medium text-muted-foreground">
+										Status:
+									</span>
+									<span className="text-xs px-2 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full border border-green-500/20">
+										Em preparo
+									</span>
+								</>
+							)}
 						</div>
 					</div>
 				</div>

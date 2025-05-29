@@ -107,6 +107,29 @@ export async function POST(req: NextRequest) {
 					await orderService.initializeOrder(false)
 					console.log('Using existing completed order to update payment method')
 				}
+			} else if (
+				existingOrder.status === 'PENDING' &&
+				existingOrder.paymentMethod &&
+				existingOrder.paymentMethod !== 'INDEFINIDO'
+			) {
+				// For confirmed orders (PENDING with payment method), check if user is adding new items or just updating payment
+				const mightBeAddingItems =
+					lastUserMessage.includes('quero') ||
+					lastUserMessage.includes('pedir') ||
+					lastUserMessage.includes('adicionar') ||
+					extractItemsWithQuantity(lastUserMessage, MENU).length > 0
+
+				if (mightBeAddingItems) {
+					// User wants to add new items - create new order
+					await orderService.initializeOrder(true)
+					console.log(
+						'Created new order because user is adding items to confirmed order'
+					)
+				} else if (mentionsPaymentMethod) {
+					// User just wants to update payment method - use existing confirmed order
+					await orderService.initializeOrder(false)
+					console.log('Using existing confirmed order to update payment method')
+				}
 			} else {
 				// For PENDING orders, check if they have items or if user is trying to add items
 				const mightBeAddingItems =

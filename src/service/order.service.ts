@@ -49,8 +49,15 @@ export class OrderService {
 				)
 
 				// If order exists and is confirmed, either keep it or create new based on param
-				if (existingOrder.status === 'COMPLETED' && resetIfCompleted) {
-					console.log('Creating new order because existing one is completed')
+				if (
+					existingOrder.status === 'PENDING' &&
+					existingOrder.paymentMethod &&
+					existingOrder.paymentMethod !== 'INDEFINIDO' &&
+					resetIfCompleted
+				) {
+					console.log(
+						'Creating new order because existing one is confirmed (has payment method)'
+					)
 					const newOrder = await OrderRepository.createOrder(this.userId)
 					this.orderId = newOrder.id
 					console.log('New order created with ID:', this.orderId)
@@ -58,9 +65,14 @@ export class OrderService {
 				}
 
 				// If order is PENDING but has no items (was cleared), create a new order
-				if (existingOrder.status === 'PENDING' && !hasItems) {
+				if (
+					existingOrder.status === 'PENDING' &&
+					!hasItems &&
+					(!existingOrder.paymentMethod ||
+						existingOrder.paymentMethod === 'INDEFINIDO')
+				) {
 					console.log(
-						'Creating new order because existing PENDING order has no items (was cleared)'
+						'Creating new order because existing PENDING order has no items (was cleared) and no payment method'
 					)
 					const newOrder = await OrderRepository.createOrder(this.userId)
 					this.orderId = newOrder.id
@@ -228,8 +240,11 @@ export class OrderService {
 
 		console.log('Manually calculated total:', total)
 
-		// Only show as confirmed if explicitly completed
-		const isConfirmed = order.status === 'COMPLETED'
+		// Only show as confirmed if order has payment method set (new confirmation logic)
+		const isConfirmed =
+			order.status === 'PENDING' &&
+			!!order.paymentMethod &&
+			order.paymentMethod !== 'INDEFINIDO'
 		const statusText = isConfirmed ? 'confirmado' : 'pendente'
 
 		return items.length > 0
@@ -339,7 +354,12 @@ export class OrderService {
 			paymentMethod: order?.paymentMethod,
 		})
 
-		const isConfirmed = order?.status === 'COMPLETED'
+		// Check if order is confirmed by verifying it has a payment method and is PENDING
+		// (since confirmed orders now stay as PENDING but have payment method set)
+		const isConfirmed =
+			order?.status === 'PENDING' &&
+			!!order?.paymentMethod &&
+			order?.paymentMethod !== 'INDEFINIDO'
 		console.log(`Order ${this.orderId} is confirmed: ${isConfirmed}`)
 
 		return isConfirmed
