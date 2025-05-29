@@ -235,22 +235,6 @@ export class OrderRepository {
 		const currentStatus = order.status
 		console.log(`Current order status before confirmation: ${currentStatus}`)
 
-		// Only update to COMPLETED if not already completed
-		if (currentStatus === 'COMPLETED') {
-			console.log('Order is already completed, only updating payment method')
-			return await prisma.order.update({
-				where: { id: orderId },
-				data: {
-					paymentMethod: paymentMethod,
-				},
-				include: {
-					items: {
-						include: { item: true },
-					},
-				},
-			})
-		}
-
 		// Check inventory availability before confirming
 		for (const orderItem of order.items) {
 			if (orderItem.item && orderItem.quantity > orderItem.item.quantity) {
@@ -277,11 +261,11 @@ export class OrderRepository {
 				}
 			}
 
-			// Set the order as COMPLETED
+			// Keep the order as PENDING but set payment method
 			return await prisma.order.update({
 				where: { id: orderId },
 				data: {
-					status: 'COMPLETED',
+					status: 'PENDING', // Keep as PENDING instead of COMPLETED
 					paymentMethod: paymentMethod,
 				},
 				include: {
@@ -292,7 +276,9 @@ export class OrderRepository {
 			})
 		})
 
-		console.log('Order confirmed and inventory updated successfully')
+		console.log(
+			'Order confirmed with PENDING status and inventory updated successfully'
+		)
 		return result
 	}
 

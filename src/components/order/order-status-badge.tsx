@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, XCircle } from 'lucide-react'
+import { CheckCircle, ChefHat, Clock, XCircle } from 'lucide-react'
 import { Badge } from '../ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -12,9 +12,9 @@ export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
 
 	switch (status) {
 		case 'PENDING':
-			icon = <Clock className="text-yellow-500" size={16} />
-			statusLabel = <p className="text-yellow-500">Pendente</p>
-			borderColor = 'border-yellow-500'
+			icon = <ChefHat className="text-blue-500" size={16} />
+			statusLabel = <p className="text-blue-500">Em preparo</p>
+			borderColor = 'border-blue-500'
 			break
 		case 'COMPLETED':
 			icon = <CheckCircle className="text-green-500" size={16} />

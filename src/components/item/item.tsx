@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
 import { Card, CardContent, CardFooter } from '../ui/card'
 import { Checkbox } from '../ui/checkbox'
 import { ManageItem } from './manage-item'
@@ -52,7 +53,26 @@ export function Item({
 						Preço: R$ {Number(price).toFixed(2)}
 					</p>
 				</CardContent>
-				<CardFooter className="p-2 pt-0 -mb-4 justify-end">
+				<CardFooter className="p-2 pt-0 -mb-4 flex justify-between items-center">
+					{/* Stock Status Badges - aligned with button */}
+					<div className="flex flex-col gap-1">
+						{available_quantity === 0 && (
+							<Badge
+								variant="destructive"
+								className="text-xs bg-red-500 text-white border-red-600 shadow-sm"
+							>
+								Esgotado
+							</Badge>
+						)}
+						{available_quantity > 0 && available_quantity <= 5 && (
+							<Badge
+								variant="outline"
+								className="text-xs bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700 shadow-sm"
+							>
+								Estoque Baixo
+							</Badge>
+						)}
+					</div>
 					<Button
 						variant="outline"
 						className="w-28 text-xs py-1 rounded-sm cursor-pointer"
