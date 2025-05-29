@@ -10,6 +10,8 @@ import {
 } from './ui/drawer'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Button } from './ui/button'
+import { Switch } from './ui/switch'
+import { Badge } from './ui/badge'
 import { authClient } from '@/lib/auth-client'
 import { IconInput } from './icon-input'
 import {
@@ -26,6 +28,9 @@ import {
 	Sun,
 	Monitor,
 	LogOut,
+	CookieIcon,
+	ExternalLink,
+	BarChart3,
 } from 'lucide-react'
 import { EditUserImageDialog } from './edit-user-image-dialog'
 import { useState, useEffect } from 'react'
@@ -33,6 +38,12 @@ import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { useMediaQuery, useIsMounted } from '@/hooks'
+import {
+	cookieManager,
+	type CookieCategory,
+	type CookiePreferences,
+	DEFAULT_PREFERENCES,
+} from '@/lib/cookie-manager'
 
 type ProfileDialogProps = {
 	open?: boolean
@@ -44,6 +55,8 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 	const [copiedEmail, setCopiedEmail] = useState(false)
 	const [activeTab, setActiveTab] = useState<'profile' | 'settings'>('profile')
 	const [isDesktop, setIsDesktop] = useState<boolean | null>(null)
+	const [cookiePreferences, setCookiePreferences] =
+		useState<CookiePreferences>(DEFAULT_PREFERENCES)
 	const { theme, setTheme } = useTheme()
 
 	const isMounted = useIsMounted()
@@ -52,11 +65,48 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 	const { data } = authClient.useSession()
 	const session = data
 
+	// Function to refresh cookie preferences
+	const refreshCookiePreferences = () => {
+		const currentPrefs = cookieManager.loadPreferences()
+		setCookiePreferences(currentPrefs)
+	}
+
 	useEffect(() => {
 		if (isMounted()) {
 			setIsDesktop(mediaQueryResult)
+			refreshCookiePreferences()
 		}
 	}, [mediaQueryResult, isMounted])
+
+	// Refresh cookie preferences when dialog opens
+	useEffect(() => {
+		if (open) {
+			refreshCookiePreferences()
+		}
+	}, [open])
+
+	// Listen for focus events to refresh preferences when returning from cookie settings
+	useEffect(() => {
+		const handleFocus = () => {
+			if (open) {
+				refreshCookiePreferences()
+			}
+		}
+
+		window.addEventListener('focus', handleFocus)
+		return () => window.removeEventListener('focus', handleFocus)
+	}, [open])
+
+	// Subscribe to cookie preference changes from other components
+	useEffect(() => {
+		const unsubscribe = cookieManager.onPreferencesChange((newPreferences) => {
+			if (open) {
+				setCookiePreferences(newPreferences)
+			}
+		})
+
+		return unsubscribe
+	}, [open])
 
 	function openEditDialog() {
 		onOpenChange?.(false)
@@ -85,6 +135,29 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 		authClient.signOut()
 		onOpenChange?.(false)
 		toast.success('Logout realizado com sucesso!')
+	}
+
+	function handleCookiePreferenceChange(
+		category: CookieCategory,
+		enabled: boolean
+	) {
+		if (category === 'essential') return // Can't disable essential cookies
+
+		const newPreferences = {
+			...cookiePreferences,
+			[category]: enabled,
+		}
+
+		setCookiePreferences(newPreferences)
+		cookieManager.savePreferences(newPreferences)
+		toast.success(
+			`Preferência de ${category} ${enabled ? 'ativada' : 'desativada'}`
+		)
+	}
+
+	function openCookieSettings() {
+		// This could open a full cookie settings page or dialog
+		window.open('/cookie-settings', '_blank')
 	}
 
 	const joinDate = session?.user.createdAt
@@ -327,6 +400,77 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 							: 'N/A'}
 					</p>
 				</div>
+			</div>
+
+			{/* Cookie Settings */}
+			<div className="space-y-3">
+				<h5 className="font-medium flex items-center gap-2">
+					<CookieIcon className="w-4 h-4" />
+					Configurações de Cookies
+				</h5>
+
+				{/* Cookie Summary */}
+				<div className="bg-muted/50 rounded-lg p-3 space-y-3">
+					<div className="flex justify-between items-center">
+						<span className="text-sm font-medium">Status atual</span>
+						<div className="flex gap-1">
+							{Object.entries(cookiePreferences).map(([key, enabled]) => (
+								<Badge
+									key={key}
+									variant={enabled ? 'default' : 'outline'}
+									className="text-xs"
+								>
+									{key === 'essential'
+										? 'Essenciais'
+										: key === 'analytics'
+											? 'Análise'
+											: 'Funcionais'}
+								</Badge>
+							))}
+						</div>
+					</div>
+
+					{/* Quick Cookie Controls */}
+					<div className="space-y-2">
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<BarChart3 className="w-4 h-4 text-muted-foreground" />
+								<span className="text-sm">Cookies de Análise</span>
+							</div>
+							<Switch
+								checked={cookiePreferences.analytics}
+								onCheckedChange={(checked) =>
+									handleCookiePreferenceChange('analytics', checked)
+								}
+							/>
+						</div>
+
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<Settings className="w-4 h-4 text-muted-foreground" />
+								<span className="text-sm">Cookies Funcionais</span>
+							</div>
+							<Switch
+								checked={cookiePreferences.functional}
+								onCheckedChange={(checked) =>
+									handleCookiePreferenceChange('functional', checked)
+								}
+							/>
+						</div>
+					</div>
+				</div>
+
+				<Button
+					onClick={openCookieSettings}
+					variant="outline"
+					className="w-full justify-between"
+				>
+					<span className="flex items-center">
+						<CookieIcon className="w-4 h-4 mr-2" />
+						Configurações Avançadas
+					</span>
+					<ExternalLink className="w-4 h-4" />
+				</Button>
 			</div>
 		</div>
 	)
