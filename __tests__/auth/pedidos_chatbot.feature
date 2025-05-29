@@ -37,3 +37,4 @@ Feature: Realização de pedidos através do chatbot
     When o usuário digita "Cancelar pedido"
     Then o chatbot deve confirmar o cancelamento
     And deve exibir o resumo do pedido com status "cancelado"
+

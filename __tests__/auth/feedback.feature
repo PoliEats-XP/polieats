@@ -25,3 +25,4 @@ Feature: Enviar feedback após pedido
     And o usuário ignora ou fecha a solicitação
     Then o sistema não deve registrar nenhuma avaliação
     And o fluxo de uso deve prosseguir normalmente
+  
