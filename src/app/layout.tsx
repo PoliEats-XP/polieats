@@ -5,6 +5,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ClientToaster } from '@/components/client-toaster'
 import { ClientQueryProvider } from '@/components/query-client-provider'
+import CookieConsent from '@/components/ui/cookie-consent'
 
 const ubuntu = Ubuntu({
 	weight: ['300', '400', '500'],
@@ -35,6 +36,7 @@ export default function RootLayout({
 					>
 						<NuqsAdapter>{children}</NuqsAdapter>
 						<ClientToaster />
+						<CookieConsent />
 					</ThemeProvider>
 				</ClientQueryProvider>
 			</body>

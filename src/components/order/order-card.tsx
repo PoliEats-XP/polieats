@@ -34,7 +34,8 @@ export function OrderCard({ order }: OrderCardProps) {
 	const formattedDateTime = formatOrderDateTime(order.date)
 	const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
 
-	const canLeaveFeedback = order.status === 'COMPLETED'
+	// Allow feedback for all order statuses, not just completed ones
+	const canLeaveFeedback = true
 	const hasFeedback = order.rating !== null && order.rating !== undefined
 
 	return (

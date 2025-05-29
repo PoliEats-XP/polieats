@@ -49,13 +49,7 @@ export async function POST(
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 		}
 
-		// Only allow feedback for completed orders
-		if (order.status !== 'COMPLETED') {
-			return NextResponse.json(
-				{ error: 'Feedback can only be submitted for completed orders' },
-				{ status: 400 }
-			)
-		}
+		// Allow feedback for orders with any status
 
 		// Update the order with feedback
 		const updatedOrder = await prisma.order.update({
