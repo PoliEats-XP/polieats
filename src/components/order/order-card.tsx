@@ -23,6 +23,7 @@ interface ActualOrder {
 	rating?: number | null
 	feedback?: string | null
 	feedbackAt?: string | null
+	paymentMethod?: string | null
 }
 
 interface OrderCardProps {
@@ -82,7 +83,6 @@ export function OrderCard({ order }: OrderCardProps) {
 								variant="outline"
 								onClick={() => setIsFeedbackModalOpen(true)}
 								className="flex items-center gap-1 w-full sm:w-auto"
-								size="sm"
 							>
 								<MessageSquare className="w-4 h-4" />
 								{hasFeedback ? 'Editar Avaliação' : 'Avaliar'}
