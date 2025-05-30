@@ -4,6 +4,9 @@ import { OrdersTable } from '@/components/admin/orders-table'
 import { OrdersStats } from '@/components/admin/orders-stats'
 import type { Metadata } from 'next'
 
+// Force dynamic rendering since we use headers() in DashboardNavbar
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
 	title: 'PoliEats - Dashboard',
 	description: 'Dashboard page for PoliEats',

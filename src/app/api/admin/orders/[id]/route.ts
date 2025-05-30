@@ -6,7 +6,7 @@ import type { Session } from '@/lib/auth'
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const { data: session } = await betterFetch<Session>(
@@ -28,7 +28,7 @@ export async function GET(
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 		}
 
-		const orderId = params.id
+		const { id: orderId } = await params
 
 		// Fetch the specific order
 		const order = await prisma.order.findUnique({
@@ -95,7 +95,7 @@ export async function GET(
 
 export async function PATCH(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const { data: session } = await betterFetch<Session>(
@@ -117,7 +117,7 @@ export async function PATCH(
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 		}
 
-		const orderId = params.id
+		const { id: orderId } = await params
 		const body = await request.json()
 		const { status } = body
 
