@@ -339,7 +339,10 @@ export function Chatbot() {
 							<h2 className="text-lg font-semibold text-card-foreground">
 								Assistente de Pedidos
 							</h2>
-							<p className="text-xs text-muted-foreground">Online</p>
+							<p className="text-xs text-muted-foreground flex items-center gap-1">
+								<span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+								Online
+							</p>
 						</div>
 					</div>
 					<button
@@ -410,12 +413,18 @@ export function Chatbot() {
 						disabled={
 							isLoading || !inputValue.trim() || orderState.orderConfirmed
 						}
-						className="flex items-center justify-center w-10 h-10 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground rounded-xl transition-colors disabled:cursor-not-allowed"
+						className="flex items-center justify-center w-10 h-10 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground/70 border disabled:border-border rounded-xl transition-colors disabled:cursor-not-allowed"
 					>
 						{isLoading ? (
-							<div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+							<div className="w-4 h-4 border-2 border-primary-foreground disabled:border-muted-foreground border-t-transparent rounded-full animate-spin"></div>
 						) : (
-							<Send className="w-4 h-4 text-primary-foreground" />
+							<Send
+								className={`w-4 h-4 ${
+									isLoading || !inputValue.trim() || orderState.orderConfirmed
+										? 'text-muted-foreground'
+										: 'text-primary-foreground'
+								}`}
+							/>
 						)}
 					</button>
 				</div>
