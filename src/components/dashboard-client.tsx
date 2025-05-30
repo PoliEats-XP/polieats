@@ -18,6 +18,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { BulkEditDialog } from '@/components/bulk-edit-dialog'
+import { ConfirmBulkDeleteDialog } from '@/components/confirm-bulk-delete-dialog'
 import { fetchMenu } from '@/utils/fetch-menu'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
@@ -61,6 +62,8 @@ export function DashboardClient() {
 	const [selectedItems, setSelectedItems] = useState<string[]>([])
 	const [showFilters, setShowFilters] = useState(false)
 	const [bulkEditOpen, setBulkEditOpen] = useState(false)
+	const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
+	const [isDeleting, setIsDeleting] = useState(false)
 	const queryClient = useQueryClient()
 
 	// Get user session for navbar variant
@@ -309,6 +312,55 @@ export function DashboardClient() {
 		} catch (error) {
 			console.error('Bulk edit failed:', error)
 			// You could add a toast notification here to show the error to the user
+		}
+	}
+
+	// Bulk delete functionality
+	const handleBulkDelete = async () => {
+		// Show confirmation dialog
+		setBulkDeleteOpen(true)
+	}
+
+	const confirmBulkDelete = async () => {
+		setIsDeleting(true)
+
+		try {
+			// Prepare delete promises for each selected item
+			const deletePromises = selectedItems.map(async (itemId) => {
+				const response = await fetch('/api/menu/items', {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ id: itemId }),
+				})
+
+				if (!response.ok) {
+					const item = items.find((item) => item.id === itemId)
+					throw new Error(`Failed to delete item ${item?.name || itemId}`)
+				}
+
+				return response.json()
+			})
+
+			// Execute all deletions
+			await Promise.all(deletePromises)
+
+			// Invalidate and refetch the menu data
+			queryClient.invalidateQueries({ queryKey: ['menu'] })
+
+			// Clear selection after successful deletion
+			setSelectedItems([])
+
+			// Close dialog
+			setBulkDeleteOpen(false)
+
+			console.log('Bulk delete completed successfully')
+		} catch (error) {
+			console.error('Bulk delete failed:', error)
+			alert('Erro ao excluir itens. Tente novamente.')
+		} finally {
+			setIsDeleting(false)
 		}
 	}
 
@@ -581,6 +633,7 @@ export function DashboardClient() {
 										variant="destructive"
 										size="sm"
 										className="flex-1 sm:flex-none"
+										onClick={handleBulkDelete}
 									>
 										<Trash2 className="w-4 h-4 mr-2" />
 										Excluir Selecionados
@@ -709,6 +762,15 @@ export function DashboardClient() {
 					selectedItems={selectedItems}
 					items={items}
 					onSave={handleBulkEdit}
+				/>
+
+				<ConfirmBulkDeleteDialog
+					open={bulkDeleteOpen}
+					onOpenChange={setBulkDeleteOpen}
+					onClose={() => setBulkDeleteOpen(false)}
+					onConfirm={confirmBulkDelete}
+					selectedCount={selectedItems.length}
+					isLoading={isDeleting}
 				/>
 			</main>
 		</>
