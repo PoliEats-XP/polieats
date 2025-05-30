@@ -112,12 +112,12 @@ export function RecentOrders() {
 	})
 
 	return (
-		<div className="flex flex-col h-full bg-card rounded-xl border shadow-sm overflow-hidden">
+		<div className="flex flex-col h-full bg-card rounded-xl border shadow-sm overflow-hidden mb-6">
 			{/* Header */}
-			<div className="border-b px-6 py-4 flex-shrink-0">
-				<div className="flex items-center justify-between">
+			<div className="border-b px-4 sm:px-6 py-4 flex-shrink-0">
+				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 					<div>
-						<h1 className="text-2xl font-bold text-card-foreground">
+						<h1 className="text-xl sm:text-2xl font-bold text-card-foreground">
 							Pedidos Recentes
 						</h1>
 						<p className="text-sm text-muted-foreground mt-1">
@@ -127,7 +127,7 @@ export function RecentOrders() {
 					<button
 						onClick={() => refetch()}
 						disabled={isLoading}
-						className="flex items-center gap-2 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						className="flex items-center gap-2 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
 						title="Recarregar pedidos"
 					>
 						<svg
@@ -150,7 +150,7 @@ export function RecentOrders() {
 
 			{/* Orders List with Scroll - Contained within card */}
 			<div className="flex-1 overflow-y-auto">
-				<div className="p-6">
+				<div className="p-4 sm:p-6 pb-6">
 					{isError ? (
 						<div className="flex flex-col items-center justify-center h-full text-center min-h-[400px]">
 							<div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">

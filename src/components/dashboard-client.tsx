@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator'
 import { BulkEditDialog } from '@/components/bulk-edit-dialog'
 import { fetchMenu } from '@/utils/fetch-menu'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { authClient } from '@/lib/auth-client'
 import {
 	Plus,
 	Grid3X3,
@@ -61,6 +62,11 @@ export function DashboardClient() {
 	const [showFilters, setShowFilters] = useState(false)
 	const [bulkEditOpen, setBulkEditOpen] = useState(false)
 	const queryClient = useQueryClient()
+
+	// Get user session for navbar variant
+	const { data } = authClient.useSession()
+	const session = data
+	const navbarVariant = session?.user?.role === 'master' ? 'master' : 'admin'
 
 	// URL state management
 	const [search] = useQueryState('search', parseAsString.withDefault(''))
@@ -308,11 +314,11 @@ export function DashboardClient() {
 
 	return (
 		<>
-			<Navbar variant="admin" activeLink="menu" />
+			<Navbar variant={navbarVariant} activeLink="menu" />
 
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
 				{/* Statistics Cards */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 							<CardTitle className="text-sm font-medium">
@@ -378,18 +384,18 @@ export function DashboardClient() {
 
 				{/* Search and Controls */}
 				<div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-					<div className="flex flex-col sm:flex-row gap-4 flex-1">
+					<div className="flex flex-col sm:flex-row gap-4 flex-1 w-full lg:w-auto">
 						<SearchInput
 							items={items}
 							disabled={items.length === 0}
 							placeholder="Buscar item..."
-							className="sm:w-80"
+							className="w-full sm:w-80"
 						/>
 
 						<Button
 							variant="outline"
 							onClick={() => setShowFilters(!showFilters)}
-							className="flex items-center gap-2"
+							className="flex items-center gap-2 w-full sm:w-auto"
 						>
 							<Filter className="w-4 h-4" />
 							Filtros
@@ -401,7 +407,7 @@ export function DashboardClient() {
 						</Button>
 					</div>
 
-					<div className="flex items-center gap-2">
+					<div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
 						{/* View Toggle */}
 						<div className="flex items-center border rounded-md">
 							<Button
@@ -429,7 +435,7 @@ export function DashboardClient() {
 							className="flex items-center gap-2"
 						>
 							<Download className="w-4 h-4" />
-							Exportar
+							<span className="hidden sm:inline">Exportar</span>
 						</Button>
 
 						{/* Add Item */}
@@ -439,7 +445,7 @@ export function DashboardClient() {
 							onClick={() => setOpen(true)}
 						>
 							<Plus className="w-4 h-4" />
-							Adicionar
+							<span className="hidden sm:inline">Adicionar</span>
 						</Button>
 					</div>
 				</div>
@@ -552,8 +558,8 @@ export function DashboardClient() {
 				{selectedItems.length > 0 && (
 					<Card className="mb-6 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
 						<CardContent className="pt-6">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
+							<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+								<div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
 									<Badge variant="secondary">
 										{selectedItems.length} selecionados
 									</Badge>
@@ -561,16 +567,21 @@ export function DashboardClient() {
 										de {filteredAndSortedItems.length} itens
 									</span>
 								</div>
-								<div className="flex items-center gap-2">
+								<div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
 									<Button
 										variant="outline"
 										size="sm"
 										onClick={() => setBulkEditOpen(true)}
+										className="flex-1 sm:flex-none"
 									>
 										<Edit className="w-4 h-4 mr-2" />
 										Editar em Lote
 									</Button>
-									<Button variant="destructive" size="sm">
+									<Button
+										variant="destructive"
+										size="sm"
+										className="flex-1 sm:flex-none"
+									>
 										<Trash2 className="w-4 h-4 mr-2" />
 										Excluir Selecionados
 									</Button>
@@ -578,6 +589,7 @@ export function DashboardClient() {
 										variant="ghost"
 										size="sm"
 										onClick={() => setSelectedItems([])}
+										className="flex-1 sm:flex-none"
 									>
 										Cancelar
 									</Button>
@@ -625,7 +637,7 @@ export function DashboardClient() {
 						</div>
 
 						{viewMode === 'grid' ? (
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
 								{filteredAndSortedItems.map((item) => (
 									<Item
 										key={item.id}
@@ -643,21 +655,23 @@ export function DashboardClient() {
 							<div className="space-y-4">
 								{filteredAndSortedItems.map((item) => (
 									<Card key={item.id} className="p-4">
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-4">
+										<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+											<div className="flex items-center gap-4 w-full">
 												<Checkbox
 													checked={selectedItems.includes(item.id)}
 													onCheckedChange={() => handleSelectItem(item.id)}
 												/>
-												<div>
-													<h3 className="font-semibold">{item.name}</h3>
+												<div className="flex-1 min-w-0">
+													<h3 className="font-semibold truncate">
+														{item.name}
+													</h3>
 													<p className="text-sm text-muted-foreground">
 														Quantidade: {item.quantity} | Preço: R${' '}
 														{Number(item.price).toFixed(2)}
 													</p>
 												</div>
 											</div>
-											<div className="flex items-center gap-2">
+											<div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
 												{item.quantity === 0 && (
 													<Badge variant="destructive">Esgotado</Badge>
 												)}

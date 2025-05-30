@@ -167,14 +167,14 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 	const totalCount = Object.keys(COOKIE_CATEGORIES).length
 
 	return (
-		<div className={cn('max-w-4xl mx-auto space-y-6', className)}>
+		<div className={cn('max-w-4xl mx-auto space-y-6 px-4 sm:px-0', className)}>
 			{/* Header */}
 			<Card>
 				<CardHeader>
 					<div className="flex items-center space-x-3">
 						<CookieIcon className="h-8 w-8 text-primary" />
 						<div>
-							<CardTitle className="text-2xl">
+							<CardTitle className="text-xl sm:text-2xl">
 								Configurações de Cookies
 							</CardTitle>
 							<CardDescription>
@@ -184,7 +184,7 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 					</div>
 				</CardHeader>
 				<CardContent>
-					<div className="flex items-center justify-between">
+					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 						<div className="space-y-1">
 							<p className="text-sm font-medium">
 								Status atual: {activeCount} de {totalCount} categorias ativas
@@ -195,12 +195,13 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 									: 'Nenhum consentimento registrado'}
 							</p>
 						</div>
-						<div className="flex space-x-2">
+						<div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
 							<Button
 								variant="outline"
 								size="sm"
 								onClick={handleResetToDefaults}
 								disabled={isSaving}
+								className="w-full sm:w-auto"
 							>
 								<RotateCcw className="w-4 h-4 mr-2" />
 								Redefinir
@@ -210,6 +211,7 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 								size="sm"
 								onClick={handleClearAllCookies}
 								disabled={isSaving}
+								className="w-full sm:w-auto"
 							>
 								<Trash2 className="w-4 h-4 mr-2" />
 								Limpar Tudo
@@ -248,37 +250,41 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 							<CardContent className="p-6">
 								<div className="space-y-4">
 									{/* Header */}
-									<div className="flex items-start justify-between space-x-4">
+									<div className="flex flex-col sm:flex-row items-start justify-between space-y-4 sm:space-y-0 sm:space-x-4">
 										<div className="flex-1 space-y-2">
-											<div className="flex items-center space-x-3">
+											<div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
 												<IconComponent className="h-6 w-6 text-primary" />
-												<div className="flex items-center space-x-2">
+												<div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
 													<h3 className="text-lg font-semibold">
 														{category.name}
 													</h3>
-													{category.required && (
-														<Badge variant="secondary" className="text-xs">
-															Obrigatório
-														</Badge>
-													)}
-													{isEnabled && !category.required && (
-														<Badge variant="default" className="text-xs">
-															Ativo
-														</Badge>
-													)}
+													<div className="flex space-x-1">
+														{category.required && (
+															<Badge variant="secondary" className="text-xs">
+																Obrigatório
+															</Badge>
+														)}
+														{isEnabled && !category.required && (
+															<Badge variant="default" className="text-xs">
+																Ativo
+															</Badge>
+														)}
+													</div>
 												</div>
 											</div>
 											<p className="text-sm text-muted-foreground">
 												{category.description}
 											</p>
 										</div>
-										<Switch
-											checked={isEnabled}
-											onCheckedChange={(checked: boolean) =>
-												handlePreferenceChange(categoryKey, checked)
-											}
-											disabled={category.required}
-										/>
+										<div className="flex-shrink-0">
+											<Switch
+												checked={isEnabled}
+												onCheckedChange={(checked: boolean) =>
+													handlePreferenceChange(categoryKey, checked)
+												}
+												disabled={category.required}
+											/>
+										</div>
 									</div>
 
 									{/* Details */}
@@ -313,7 +319,7 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 			{/* Action Buttons */}
 			<Card>
 				<CardContent className="p-6">
-					<div className="flex justify-between items-center">
+					<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 						<div className="space-y-1">
 							<p className="text-sm font-medium">
 								Pronto para salvar suas preferências?
@@ -322,12 +328,12 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 								Suas configurações serão aplicadas imediatamente
 							</p>
 						</div>
-						<div className="flex space-x-2">
+						<div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
 							<Button
 								variant="outline"
 								onClick={handleGoHome}
 								disabled={isSaving}
-								className="flex items-center gap-2"
+								className="flex items-center gap-2 w-full sm:w-auto"
 							>
 								<Home className="w-4 h-4" />
 								Início
@@ -335,7 +341,7 @@ export function CookieSettingsPage({ className }: CookieSettingsPageProps) {
 							<Button
 								onClick={handleSavePreferences}
 								disabled={!hasChanges || isSaving}
-								className="bg-gradient-to-r from-[#ED2152] to-[#C71585]"
+								className="bg-gradient-to-r from-[#ED2152] to-[#C71585] w-full sm:w-auto"
 							>
 								{isSaving ? (
 									<>

@@ -29,11 +29,7 @@ export default function RootLayout({
 				suppressHydrationWarning
 			>
 				<ClientQueryProvider>
-					<ThemeProvider
-						attribute="class"
-						defaultTheme="light"
-						disableTransitionOnChange
-					>
+					<ThemeProvider attribute="class" defaultTheme="light">
 						<NuqsAdapter>{children}</NuqsAdapter>
 						<ClientToaster />
 						<CookieConsent />

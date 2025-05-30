@@ -48,9 +48,16 @@ import {
 type ProfileDialogProps = {
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
+	showLogoutInProfile?: boolean
+	onLogout?: () => Promise<void>
 }
 
-export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
+export function ProfileDialog({
+	open,
+	onOpenChange,
+	showLogoutInProfile,
+	onLogout,
+}: ProfileDialogProps) {
 	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 	const [copiedEmail, setCopiedEmail] = useState(false)
 	const [activeTab, setActiveTab] = useState<'profile' | 'settings'>('profile')
@@ -374,19 +381,21 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 			</div>
 
 			{/* Account Actions */}
-			<div className="space-y-3">
-				<h5 className="font-medium">Ações da Conta</h5>
-				<div className="space-y-2">
-					<Button
-						onClick={handleSignOut}
-						variant="destructive"
-						className="w-full justify-start"
-					>
-						<LogOut className="w-4 h-4 mr-2" />
-						Sair da Conta
-					</Button>
+			{showLogoutInProfile && (
+				<div className="space-y-3">
+					<h5 className="font-medium">Ações da Conta</h5>
+					<div className="space-y-2">
+						<Button
+							onClick={onLogout || handleSignOut}
+							variant="destructive"
+							className="w-full justify-start"
+						>
+							<LogOut className="w-4 h-4 mr-2" />
+							Sair da Conta
+						</Button>
+					</div>
 				</div>
-			</div>
+			)}
 
 			{/* Account Info */}
 			<div className="bg-muted/50 rounded-lg p-4 space-y-2">
