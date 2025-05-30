@@ -15,6 +15,7 @@ interface ActualOrder {
 	rating?: number | null
 	feedback?: string | null
 	feedbackAt?: string | null
+	paymentMethod?: string | null
 }
 
 interface OrderProps {
