@@ -1,5 +1,5 @@
 import { StarRating } from '@/components/ui/star-rating'
-import { Star } from 'lucide-react'
+import { Star, Wallet } from 'lucide-react'
 
 // Define the actual order structure being used
 interface OrderItem {
@@ -17,11 +17,29 @@ interface ActualOrder {
 	rating?: number | null
 	feedback?: string | null
 	feedbackAt?: string | null
+	paymentMethod?: string | null
 }
 
 interface DetailsItemsProps {
 	component: 'drawer' | 'dialog'
 	order: ActualOrder
+}
+
+function getPaymentMethodLabel(paymentMethod: string | null) {
+	switch (paymentMethod) {
+		case 'CASH':
+			return 'Dinheiro'
+		case 'CREDIT_CARD':
+			return 'Cartão de Crédito'
+		case 'DEBIT_CARD':
+			return 'Cartão de Débito'
+		case 'PIX':
+			return 'PIX'
+		case 'INDEFINIDO':
+			return 'Indefinido'
+		default:
+			return 'Não informado'
+	}
 }
 
 export function DetailsItems({ component, order }: DetailsItemsProps) {
@@ -48,6 +66,21 @@ export function DetailsItems({ component, order }: DetailsItemsProps) {
 					</div>
 				</div>
 			))}
+
+			{/* Payment Method Section */}
+			<div
+				className={`mt-4 p-3 bg-muted/30 rounded-md border ${component === 'drawer' ? 'mb-2' : ''}`}
+			>
+				<div className="flex items-center gap-2">
+					<Wallet className="w-4 h-4 text-muted-foreground" />
+					<div>
+						<p className="text-sm font-medium">Método de Pagamento</p>
+						<p className="text-sm text-muted-foreground">
+							{getPaymentMethodLabel(order.paymentMethod || null)}
+						</p>
+					</div>
+				</div>
+			</div>
 
 			{/* Feedback Section */}
 			{hasFeedback && (

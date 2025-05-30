@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
 			rating: order.rating,
 			feedback: order.feedback,
 			feedbackAt: order.feedbackAt?.toISOString(),
+			paymentMethod: order.paymentMethod,
 		}))
 
 		const hasMore = offset + orders.length < totalOrders
