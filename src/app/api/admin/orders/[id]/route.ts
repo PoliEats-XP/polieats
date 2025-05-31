@@ -3,10 +3,11 @@ import { prisma } from '@/lib/prisma'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import type { Session } from '@/lib/auth'
+import { createOrderStatusNotification } from '@/service/notification'
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const { data: session } = await betterFetch<Session>(
@@ -28,7 +29,7 @@ export async function GET(
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 		}
 
-		const orderId = params.id
+		const { id: orderId } = await params
 
 		// Fetch the specific order
 		const order = await prisma.order.findUnique({
@@ -95,7 +96,7 @@ export async function GET(
 
 export async function PATCH(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const { data: session } = await betterFetch<Session>(
@@ -117,7 +118,7 @@ export async function PATCH(
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 		}
 
-		const orderId = params.id
+		const { id: orderId } = await params
 		const body = await request.json()
 		const { status } = body
 
@@ -131,6 +132,19 @@ export async function PATCH(
 				},
 				{ status: 400 }
 			)
+		}
+
+		// Get the current order to check the old status
+		const currentOrder = await prisma.order.findUnique({
+			where: { id: orderId },
+			select: {
+				status: true,
+				userId: true,
+			},
+		})
+
+		if (!currentOrder) {
+			return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 		}
 
 		// Update the order status
@@ -152,6 +166,21 @@ export async function PATCH(
 				},
 			},
 		})
+
+		// Create notification if status actually changed
+		if (currentOrder.status !== status) {
+			try {
+				await createOrderStatusNotification(
+					currentOrder.userId,
+					orderId,
+					currentOrder.status as 'PENDING' | 'COMPLETED' | 'CANCELLED',
+					status as 'PENDING' | 'COMPLETED' | 'CANCELLED'
+				)
+			} catch (notificationError) {
+				console.error('Error creating notification:', notificationError)
+				// Don't fail the order update if notification fails
+			}
+		}
 
 		// Transform the data to match the expected format
 		const transformedOrder = {

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { ThemeSwitcher } from './theme-switcher'
 import { AvatarDropdown } from './avatar-dropdown'
+import { NotificationBellWrapper } from './notification-wrapper'
 
 export type NavbarProps = {
 	variant?: 'default' | 'admin' | 'master'
@@ -70,6 +71,7 @@ export function Navbar({
 						</div>
 
 						<div className="hidden md:flex items-center gap-4">
+							<NotificationBellWrapper />
 							<ThemeSwitcher />
 							<AvatarDropdown />
 						</div>
@@ -101,7 +103,10 @@ export function Navbar({
 					}`}
 				>
 					{variant !== 'default' && renderLinks()}
-					<ThemeSwitcher />
+					<div className="flex items-center gap-4">
+						<NotificationBellWrapper />
+						<ThemeSwitcher />
+					</div>
 					<AvatarDropdown />
 				</div>
 			</div>
