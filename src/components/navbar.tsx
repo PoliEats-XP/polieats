@@ -3,19 +3,18 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
-import { ThemeSwitcher } from './theme-switcher'
+import { Menu, X, ShoppingBag, ChefHat } from 'lucide-react'
 import { AvatarDropdown } from './avatar-dropdown'
 import { NotificationBellWrapper } from './notification-wrapper'
 
 export type NavbarProps = {
 	variant?: 'default' | 'admin' | 'master'
-	activeLink?: 'orders' | 'menu'
+	activeLink?: 'orders' | 'menu' | null
 }
 
 export function Navbar({
 	variant = 'default',
-	activeLink = 'orders',
+	activeLink = null,
 }: NavbarProps) {
 	const [menuOpen, setMenuOpen] = useState(false)
 
@@ -24,26 +23,84 @@ export function Navbar({
 	const renderLinks = () => {
 		if (variant === 'default') return null
 
+		// Master users get access to all existing admin functionality
+		if (variant === 'master') {
+			const masterLinks = [
+				{
+					key: 'orders',
+					label: 'Pedidos',
+					href: '/dashboard',
+					icon: ShoppingBag,
+					description: 'Gerenciar pedidos do sistema',
+				},
+				{
+					key: 'menu',
+					label: 'Menu',
+					href: '/dashboard/menu',
+					icon: ChefHat,
+					description: 'Gerenciar cardápio e itens',
+				},
+			]
+
+			return (
+				<div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+					{masterLinks.map((link) => {
+						const Icon = link.icon
+						const isActive = activeLink === link.key
+
+						return (
+							<Link
+								key={link.key}
+								href={link.href}
+								className={`flex items-center gap-2 transition-all duration-200 ${
+									isActive
+										? 'bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text font-medium'
+										: 'hover:opacity-80'
+								}`}
+								title={link.description}
+							>
+								<Icon
+									size={16}
+									className={isActive ? 'text-gradient-from' : 'text-current'}
+								/>
+								<span>{link.label}</span>
+							</Link>
+						)
+					})}
+				</div>
+			)
+		}
+
+		// Admin users get limited access to existing functionality only
 		return (
 			<div className="flex flex-col md:flex-row md:items-center gap-4">
 				{activeLink === 'orders' ? (
 					<>
-						<p className="bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text">
+						<p className="bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text flex items-center gap-2">
+							<ShoppingBag size={16} className="text-gradient-from" />
 							Pedidos
 						</p>
 						<Link
 							href="/dashboard/menu"
-							className="hover:opacity-80 transition"
+							className="hover:opacity-80 transition flex items-center gap-2"
+							title="Gerenciar cardápio e itens"
 						>
+							<ChefHat size={16} />
 							Menu
 						</Link>
 					</>
 				) : (
 					<>
-						<Link href="/dashboard" className="hover:opacity-80 transition">
+						<Link
+							href="/dashboard"
+							className="hover:opacity-80 transition flex items-center gap-2"
+							title="Gerenciar pedidos do sistema"
+						>
+							<ShoppingBag size={16} />
 							Pedidos
 						</Link>
-						<p className="bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text">
+						<p className="bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text flex items-center gap-2">
+							<ChefHat size={16} className="text-gradient-from" />
 							Menu
 						</p>
 					</>
@@ -72,7 +129,6 @@ export function Navbar({
 
 						<div className="hidden md:flex items-center gap-4">
 							<NotificationBellWrapper />
-							<ThemeSwitcher />
 							<AvatarDropdown />
 						</div>
 
@@ -105,7 +161,6 @@ export function Navbar({
 					{variant !== 'default' && renderLinks()}
 					<div className="flex items-center gap-4">
 						<NotificationBellWrapper />
-						<ThemeSwitcher />
 					</div>
 					<AvatarDropdown />
 				</div>

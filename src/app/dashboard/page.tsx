@@ -1,8 +1,11 @@
 import { EmailVerificationBanner } from '@/components/email-verification-banner'
-import { Navbar } from '@/components/navbar'
+import { DashboardNavbar } from '@/components/dashboard-navbar'
 import { OrdersTable } from '@/components/admin/orders-table'
 import { OrdersStats } from '@/components/admin/orders-stats'
 import type { Metadata } from 'next'
+
+// Force dynamic rendering since we use headers() in DashboardNavbar
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
 	title: 'PoliEats - Dashboard',
@@ -14,7 +17,7 @@ export default function Dashboard() {
 		<>
 			<EmailVerificationBanner />
 
-			<Navbar variant="admin" />
+			<DashboardNavbar activeLink="orders" />
 
 			<div className="container mx-auto p-6">
 				<div className="mb-8">

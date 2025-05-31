@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
 			lastUserMessage.includes('novo pedido') ||
 			lastUserMessage.includes('começar de novo') ||
 			lastUserMessage.includes('iniciar pedido') ||
+			lastUserMessage.includes('novo') ||
 			messages.length <= 1 // First message is always a new order
 
 		// Check if user is mentioning payment method
@@ -65,90 +66,56 @@ export async function POST(req: NextRequest) {
 			lastUserMessage.includes('credit') ||
 			lastUserMessage.includes('debit')
 
-		// Initialize order only if explicitly requesting a new order or adding an item
+		// Check if user is trying to add items
+		const mightBeAddingItems =
+			lastUserMessage.includes('quero') ||
+			lastUserMessage.includes('pedir') ||
+			lastUserMessage.includes('adicionar') ||
+			extractItemsWithQuantity(lastUserMessage, MENU).length > 0
+
+		// Get existing order to determine current state
+		const existingOrder = await OrderRepository.findOrderByUserId(userId)
+
+		// Simplified order initialization logic
 		if (isNewOrderRequest) {
-			// Always reset when explicitly requesting a new order
+			// User explicitly wants a new order - always create fresh
+			console.log('Creating new order: explicit request')
 			await orderService.initializeOrder(true)
-		} else {
-			// Check if there's an existing order before initializing
-			const existingOrder = await OrderRepository.findOrderByUserId(userId)
-
-			if (!existingOrder) {
-				// No existing order - create new one if adding items or mentioning payment method
-				const mightBeAddingItems =
-					lastUserMessage.includes('quero') ||
-					lastUserMessage.includes('pedir') ||
-					lastUserMessage.includes('adicionar') ||
-					extractItemsWithQuantity(lastUserMessage, MENU).length > 0
-
-				if (mightBeAddingItems || mentionsPaymentMethod) {
-					await orderService.initializeOrder(true)
-					console.log(
-						'Created new order due to:',
-						mightBeAddingItems ? 'items detected' : 'payment method mentioned'
-					)
-				}
-			} else if (existingOrder.status === 'COMPLETED') {
-				// For COMPLETED orders, check if user is adding new items or just updating payment
-				const mightBeAddingItems =
-					lastUserMessage.includes('quero') ||
-					lastUserMessage.includes('pedir') ||
-					lastUserMessage.includes('adicionar') ||
-					extractItemsWithQuantity(lastUserMessage, MENU).length > 0
-
-				if (mightBeAddingItems) {
-					// User wants to add new items - create new order
-					await orderService.initializeOrder(true)
-					console.log(
-						'Created new order because user is adding items to completed order'
-					)
-				} else if (mentionsPaymentMethod) {
-					// User just wants to update payment method - use existing completed order
-					await orderService.initializeOrder(false)
-					console.log('Using existing completed order to update payment method')
-				}
-			} else if (
-				existingOrder.status === 'PENDING' &&
+		} else if (!existingOrder) {
+			// No existing order - create new one if user is adding items or mentioning payment
+			if (mightBeAddingItems || mentionsPaymentMethod) {
+				console.log(
+					'Creating new order: no existing order, user is adding items or payment'
+				)
+				await orderService.initializeOrder(true)
+			}
+		} else if (existingOrder.status === 'COMPLETED') {
+			// Order is completed - always create new order for any new activity
+			if (mightBeAddingItems || mentionsPaymentMethod || isNewOrderRequest) {
+				console.log('Creating new order: existing order is completed')
+				await orderService.initializeOrder(true)
+			}
+		} else if (existingOrder.status === 'PENDING') {
+			// For PENDING orders, check if it's confirmed (has payment method)
+			const isConfirmed =
 				existingOrder.paymentMethod &&
 				existingOrder.paymentMethod !== 'INDEFINIDO'
-			) {
-				// For confirmed orders (PENDING with payment method), check if user is adding new items or just updating payment
-				const mightBeAddingItems =
-					lastUserMessage.includes('quero') ||
-					lastUserMessage.includes('pedir') ||
-					lastUserMessage.includes('adicionar') ||
-					extractItemsWithQuantity(lastUserMessage, MENU).length > 0
 
-				if (mightBeAddingItems) {
-					// User wants to add new items - create new order
-					await orderService.initializeOrder(true)
-					console.log(
-						'Created new order because user is adding items to confirmed order'
-					)
-				} else if (mentionsPaymentMethod) {
-					// User just wants to update payment method - use existing confirmed order
-					await orderService.initializeOrder(false)
-					console.log('Using existing confirmed order to update payment method')
-				}
+			if (isConfirmed && mightBeAddingItems) {
+				// Confirmed order + user adding new items = create new order
+				console.log(
+					'Creating new order: confirmed order, user adding new items'
+				)
+				await orderService.initializeOrder(true)
 			} else {
-				// For PENDING orders, check if they have items or if user is trying to add items
-				const mightBeAddingItems =
-					lastUserMessage.includes('quero') ||
-					lastUserMessage.includes('pedir') ||
-					lastUserMessage.includes('adicionar') ||
-					extractItemsWithQuantity(lastUserMessage, MENU).length > 0
-
-				if (
-					mightBeAddingItems ||
-					mentionsPaymentMethod ||
-					existingOrder.status === 'PENDING'
-				) {
-					await orderService.initializeOrder(false)
-					console.log(
-						'Using existing order for payment method or pending status'
-					)
-				}
+				// Use existing PENDING order for other activities
+				console.log('Using existing PENDING order')
+				await orderService.initializeOrder(false)
 			}
+		} else {
+			// Default case - use existing order
+			console.log('Using existing order: default case')
+			await orderService.initializeOrder(false)
 		}
 
 		console.log('Order initialization complete, userId:', userId)

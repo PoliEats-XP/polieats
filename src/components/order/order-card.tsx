@@ -23,6 +23,7 @@ interface ActualOrder {
 	rating?: number | null
 	feedback?: string | null
 	feedbackAt?: string | null
+	paymentMethod?: string | null
 }
 
 interface OrderCardProps {
@@ -42,11 +43,17 @@ export function OrderCard({ order }: OrderCardProps) {
 		<>
 			<Card className="w-full min-h-52 flex flex-col justify-between">
 				<div>
-					<CardHeader className="flex justify-between items-center font-medium text-2xl">
-						<p>Pedido #{orderNumber}</p>
-						<OrderStatusBadge status={order.status} />
+					<CardHeader className="flex flex-row justify-between items-start font-medium text-2xl pb-2">
+						<div className="flex-1 min-w-0">
+							<p className="text-xl sm:text-2xl truncate">
+								Pedido #{orderNumber}
+							</p>
+						</div>
+						<div className="ml-4 flex-shrink-0">
+							<OrderStatusBadge status={order.status} />
+						</div>
 					</CardHeader>
-					<CardDescription className="pl-6 -mt-1 font-light text-midgray">
+					<CardDescription className="px-6 -mt-1 font-light text-midgray">
 						{formattedDateTime}
 					</CardDescription>
 
@@ -66,14 +73,16 @@ export function OrderCard({ order }: OrderCardProps) {
 						</div>
 					)}
 				</div>
-				<CardFooter className="flex justify-between items-center">
-					<p>Valor total do pedido: R$ {order.total}</p>
-					<div className="flex gap-2">
+				<CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+					<p className="text-sm sm:text-base font-medium">
+						Valor total do pedido: R$ {order.total}
+					</p>
+					<div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
 						{canLeaveFeedback && (
 							<Button
 								variant="outline"
 								onClick={() => setIsFeedbackModalOpen(true)}
-								className="flex items-center gap-1"
+								className="flex items-center gap-1 w-full sm:w-auto"
 							>
 								<MessageSquare className="w-4 h-4" />
 								{hasFeedback ? 'Editar Avaliação' : 'Avaliar'}

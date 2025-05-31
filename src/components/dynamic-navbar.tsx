@@ -10,5 +10,6 @@ export function DynamicNavbar() {
 	// Determine navbar variant based on user role
 	const navbarVariant = session?.user.role === 'master' ? 'master' : 'default'
 
-	return <Navbar variant={navbarVariant} />
+	// Don't set any active link for non-dashboard pages
+	return <Navbar variant={navbarVariant} activeLink={null} />
 }

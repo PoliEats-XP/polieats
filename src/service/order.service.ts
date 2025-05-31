@@ -21,7 +21,9 @@ export class OrderService {
 	async initializeOrder(resetIfCompleted = true): Promise<void> {
 		// First check if user already has an active order
 		try {
-			console.log(`Initializing order for user ${this.userId}...`)
+			console.log(
+				`Initializing order for user ${this.userId}, resetIfCompleted: ${resetIfCompleted}`
+			)
 
 			if (!this.userId) {
 				console.error('Cannot initialize order: userId is missing')
@@ -37,6 +39,15 @@ export class OrderService {
 				)
 				console.log(`Order status: ${existingOrder.status}`)
 
+				// If resetIfCompleted is true, always create a new order
+				if (resetIfCompleted) {
+					console.log('Creating new order because resetIfCompleted is true')
+					const newOrder = await OrderRepository.createOrder(this.userId)
+					this.orderId = newOrder.id
+					console.log('New order created with ID:', this.orderId)
+					return
+				}
+
 				// Check if the existing order has any items
 				const orderWithItems = await OrderRepository.getOrderById(
 					existingOrder.id
@@ -48,19 +59,12 @@ export class OrderService {
 					`Existing order has ${orderWithItems?.items?.length || 0} items`
 				)
 
-				// If order exists and is confirmed, either keep it or create new based on param
-				if (
-					existingOrder.status === 'PENDING' &&
-					existingOrder.paymentMethod &&
-					existingOrder.paymentMethod !== 'INDEFINIDO' &&
-					resetIfCompleted
-				) {
+				// For completed orders, only reuse if explicitly allowed (resetIfCompleted = false)
+				if (existingOrder.status === 'COMPLETED') {
 					console.log(
-						'Creating new order because existing one is confirmed (has payment method)'
+						'Using existing COMPLETED order (resetIfCompleted is false)'
 					)
-					const newOrder = await OrderRepository.createOrder(this.userId)
-					this.orderId = newOrder.id
-					console.log('New order created with ID:', this.orderId)
+					this.orderId = existingOrder.id
 					return
 				}
 
@@ -80,7 +84,7 @@ export class OrderService {
 					return
 				}
 
-				// For all other existing orders, use them
+				// For existing PENDING orders, use them
 				console.log(`Using existing ${existingOrder.status} order`)
 				this.orderId = existingOrder.id
 				return

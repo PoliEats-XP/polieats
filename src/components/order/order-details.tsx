@@ -17,6 +17,8 @@ import {
 import { OrderDetailsDrawerFooter } from './ui/details-footer'
 import { DetailsItems } from './ui/details-items'
 import { generateOrderNumber } from '@/lib/utils'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 // Define the actual order structure being used
 interface OrderItem {
 	name: string
@@ -33,6 +35,7 @@ interface ActualOrder {
 	rating?: number | null
 	feedback?: string | null
 	feedbackAt?: string | null
+	paymentMethod?: string | null
 }
 
 interface OrderDetailsProps {
@@ -46,6 +49,35 @@ export function OrderDetails({ order }: OrderDetailsProps) {
 	const isMounted = useIsMounted()
 	const mediaQueryResult = useMediaQuery('(min-width: 768px)')
 	const orderNumber = generateOrderNumber(order.id)
+	const queryClient = useQueryClient()
+
+	const cancelOrderMutation = useMutation({
+		mutationFn: async () => {
+			const response = await fetch(`/api/orders/${order.id}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ action: 'cancel' }),
+			})
+
+			if (!response.ok) {
+				throw new Error('Failed to cancel order')
+			}
+
+			return response.json()
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['orders'] })
+			toast.success('Pedido cancelado com sucesso!')
+			setOpen(false)
+			setOpenConfirmation(false)
+		},
+		onError: (error: Error) => {
+			toast.error(`Erro ao cancelar o pedido: ${error.message}`)
+		},
+	})
+
 	useEffect(() => {
 		if (isMounted()) {
 			setIsDesktop(mediaQueryResult)
@@ -57,7 +89,9 @@ export function OrderDetails({ order }: OrderDetailsProps) {
 		setOpen(false)
 	}
 
-	function handleDeleteOrder() {}
+	function handleDeleteOrder() {
+		cancelOrderMutation.mutate()
+	}
 
 	if (!isMounted() || isDesktop === null) {
 		return (
@@ -103,6 +137,8 @@ export function OrderDetails({ order }: OrderDetailsProps) {
 					open={openConfirmation}
 					onClose={() => setOpenConfirmation(false)}
 					deleteOrder={handleDeleteOrder}
+					orderId={order.id}
+					isLoading={cancelOrderMutation.isPending}
 				/>
 			</>
 		)

@@ -101,7 +101,7 @@ export function BulkEditDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[600px]">
+			<DialogContent className="sm:max-w-[600px] max-h-[95vh] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Editar em Lote</DialogTitle>
 					<DialogDescription>
@@ -132,11 +132,12 @@ export function BulkEditDialog({
 					{/* Edit Mode Toggle */}
 					<div>
 						<Label className="text-sm font-medium">Modo de Edição</Label>
-						<div className="mt-2 flex gap-2">
+						<div className="mt-2 flex flex-col sm:flex-row gap-2">
 							<Button
 								variant={editMode === 'relative' ? 'default' : 'outline'}
 								size="sm"
 								onClick={() => setEditMode('relative')}
+								className="flex-1"
 							>
 								Alteração Relativa
 							</Button>
@@ -144,6 +145,7 @@ export function BulkEditDialog({
 								variant={editMode === 'absolute' ? 'default' : 'outline'}
 								size="sm"
 								onClick={() => setEditMode('absolute')}
+								className="flex-1"
 							>
 								Valor Absoluto
 							</Button>
@@ -156,7 +158,7 @@ export function BulkEditDialog({
 					</div>
 
 					{/* Price Edit */}
-					<div className="grid grid-cols-2 gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<div>
 							<Label htmlFor="price" className="text-sm font-medium">
 								{editMode === 'relative' ? 'Alterar Preço (±)' : 'Novo Preço'}
@@ -271,9 +273,12 @@ export function BulkEditDialog({
 									const safeCalculatedQuantity = Number(calculatedQuantity) || 0
 
 									return (
-										<div key={item.id} className="text-xs flex justify-between">
-											<span>{item.name}</span>
-											<span>
+										<div
+											key={item.id}
+											className="text-xs flex flex-col sm:flex-row justify-between gap-1"
+										>
+											<span className="font-medium truncate">{item.name}</span>
+											<span className="text-muted-foreground text-right">
 												R$ {safeCurrentPrice.toFixed(2)} → R${' '}
 												{safeFinalPrice.toFixed(2)} | {item.quantity} →{' '}
 												{safeCalculatedQuantity}
@@ -291,8 +296,12 @@ export function BulkEditDialog({
 					)}
 				</div>
 
-				<DialogFooter>
-					<Button variant="outline" onClick={handleCancel}>
+				<DialogFooter className="flex-col sm:flex-row gap-2">
+					<Button
+						variant="outline"
+						onClick={handleCancel}
+						className="w-full sm:w-auto"
+					>
 						Cancelar
 					</Button>
 					<Button
@@ -302,6 +311,7 @@ export function BulkEditDialog({
 								? !priceChange && !quantityChange
 								: !newPrice && !newQuantity
 						}
+						className="w-full sm:w-auto"
 					>
 						Aplicar Alterações
 					</Button>

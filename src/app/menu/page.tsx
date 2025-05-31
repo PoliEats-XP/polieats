@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { MenuClient } from '../../components/menu-client'
+import { Suspense } from 'react'
+
+// Force dynamic rendering since this page uses search params
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
 	title: 'PoliEats - Menu',
