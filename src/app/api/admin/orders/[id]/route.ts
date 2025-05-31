@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import type { Session } from '@/lib/auth'
+import { createOrderStatusNotification } from '@/service/notification'
 
 export async function GET(
 	request: NextRequest,
@@ -133,6 +134,19 @@ export async function PATCH(
 			)
 		}
 
+		// Get the current order to check the old status
+		const currentOrder = await prisma.order.findUnique({
+			where: { id: orderId },
+			select: {
+				status: true,
+				userId: true,
+			},
+		})
+
+		if (!currentOrder) {
+			return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+		}
+
 		// Update the order status
 		const updatedOrder = await prisma.order.update({
 			where: { id: orderId },
@@ -152,6 +166,21 @@ export async function PATCH(
 				},
 			},
 		})
+
+		// Create notification if status actually changed
+		if (currentOrder.status !== status) {
+			try {
+				await createOrderStatusNotification(
+					currentOrder.userId,
+					orderId,
+					currentOrder.status as 'PENDING' | 'COMPLETED' | 'CANCELLED',
+					status as 'PENDING' | 'COMPLETED' | 'CANCELLED'
+				)
+			} catch (notificationError) {
+				console.error('Error creating notification:', notificationError)
+				// Don't fail the order update if notification fails
+			}
+		}
 
 		// Transform the data to match the expected format
 		const transformedOrder = {

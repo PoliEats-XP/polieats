@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { DashboardClient } from '../../../components/dashboard-client'
 import { EmailVerificationBanner } from '@/components/email-verification-banner'
 import { Suspense } from 'react'
@@ -11,14 +12,30 @@ export const metadata: Metadata = {
 	description: 'Dashboard page for PoliEats - Menu',
 }
 
-function DashboardFallback() {
+function DashboardLoading() {
 	return (
-		<div className="container mx-auto p-6">
-			<div className="flex items-center justify-center h-64">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-					<p className="text-muted-foreground">Carregando dashboard...</p>
-				</div>
+		<div className="flex-1 space-y-4 p-8 pt-6">
+			<div className="flex items-center justify-between space-y-2">
+				<div className="h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-48" />
+				<div className="h-10 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-32" />
+			</div>
+
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+				{[...Array(4)].map((_, idx) => (
+					<div
+						key={idx}
+						className="h-32 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg"
+					/>
+				))}
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				{[...Array(8)].map((_, idx) => (
+					<div
+						key={idx}
+						className="h-64 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg"
+					/>
+				))}
 			</div>
 		</div>
 	)
@@ -29,7 +46,7 @@ export default function Dashboard() {
 		<>
 			<EmailVerificationBanner />
 
-			<Suspense fallback={<DashboardFallback />}>
+			<Suspense fallback={<DashboardLoading />}>
 				<DashboardClient />
 			</Suspense>
 		</>

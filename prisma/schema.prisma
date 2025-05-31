@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String         @id
   name          String
   email         String
   emailVerified Boolean
@@ -24,6 +24,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   Order         Order[]
+  notifications Notification[] @relation("UserNotifications")
 
   role       String?
   banned     Boolean?
@@ -91,6 +92,7 @@ model Order {
   updatedAt     DateTime       @updatedAt
   items         OrderItem[]
   paymentMethod PaymentMethod?
+  notifications Notification[] @relation("OrderNotifications")
 
   // Feedback fields
   rating     Int? // 0-5 stars, null if no feedback given
@@ -135,4 +137,25 @@ enum PaymentMethod {
   DEBIT_CARD
   PIX
   INDEFINIDO
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      NotificationType @default(ORDER_UPDATE)
+  read      Boolean          @default(false)
+  orderId   String? // Reference to the order that triggered this notification
+  order     Order?           @relation("OrderNotifications", fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@map("notification")
+}
+
+enum NotificationType {
+  ORDER_UPDATE
+  GENERAL
 }

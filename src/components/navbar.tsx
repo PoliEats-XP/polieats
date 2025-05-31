@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Menu, X, ShoppingBag, ChefHat } from 'lucide-react'
 import { AvatarDropdown } from './avatar-dropdown'
+import { NotificationBellWrapper } from './notification-wrapper'
 
 export type NavbarProps = {
 	variant?: 'default' | 'admin' | 'master'
@@ -127,6 +128,7 @@ export function Navbar({
 						</div>
 
 						<div className="hidden md:flex items-center gap-4">
+							<NotificationBellWrapper />
 							<AvatarDropdown />
 						</div>
 
@@ -157,11 +159,10 @@ export function Navbar({
 					}`}
 				>
 					{variant !== 'default' && renderLinks()}
-					<div className="pt-2 border-t border-border">
-						<div className="mt-2">
-							<AvatarDropdown />
-						</div>
+					<div className="flex items-center gap-4">
+						<NotificationBellWrapper />
 					</div>
+					<AvatarDropdown />
 				</div>
 			</div>
 		</nav>

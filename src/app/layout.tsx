@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { ClientToaster } from '@/components/client-toaster'
 import { ClientQueryProvider } from '@/components/query-client-provider'
 import CookieConsent from '@/components/ui/cookie-consent'
+import { NotificationWrapper } from '@/components/notification-wrapper'
 
 const ubuntu = Ubuntu({
 	weight: ['300', '400', '500'],
@@ -29,10 +30,16 @@ export default function RootLayout({
 				suppressHydrationWarning
 			>
 				<ClientQueryProvider>
-					<ThemeProvider attribute="class" defaultTheme="light">
-						<NuqsAdapter>{children}</NuqsAdapter>
-						<ClientToaster />
-						<CookieConsent />
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="light"
+						disableTransitionOnChange
+					>
+						<NotificationWrapper>
+							<NuqsAdapter>{children}</NuqsAdapter>
+							<ClientToaster />
+							<CookieConsent />
+						</NotificationWrapper>
 					</ThemeProvider>
 				</ClientQueryProvider>
 			</body>

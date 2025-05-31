@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { MenuClient } from '../../components/menu-client'
 import { Suspense } from 'react'
 
@@ -10,14 +11,20 @@ export const metadata: Metadata = {
 	description: 'Browse our delicious menu items',
 }
 
-function MenuFallback() {
+function MenuLoading() {
 	return (
-		<div className="container mx-auto p-6">
-			<div className="flex items-center justify-center h-64">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-					<p className="text-muted-foreground">Carregando menu...</p>
-				</div>
+		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+			<div className="mb-8">
+				<div className="h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mb-2 w-48" />
+				<div className="h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-96" />
+			</div>
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				{[...Array(8)].map((_, idx) => (
+					<div
+						key={idx}
+						className="h-64 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg"
+					/>
+				))}
 			</div>
 		</div>
 	)
@@ -25,7 +32,7 @@ function MenuFallback() {
 
 export default function MenuPage() {
 	return (
-		<Suspense fallback={<MenuFallback />}>
+		<Suspense fallback={<MenuLoading />}>
 			<MenuClient />
 		</Suspense>
 	)
