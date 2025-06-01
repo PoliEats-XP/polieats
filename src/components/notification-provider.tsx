@@ -126,6 +126,9 @@ export function NotificationProvider({
 			if (response.ok) {
 				setNotifications([])
 				setUnreadCount(0)
+			} else {
+				const { error } = await response.json().catch(() => ({}))
+				throw new Error(error ?? 'Falha ao limpar notificações')
 			}
 		} catch (error) {
 			console.error('Error clearing notifications:', error)
