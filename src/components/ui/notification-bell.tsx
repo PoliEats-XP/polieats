@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Bell, Check, X } from 'lucide-react'
+import { Bell, Check, X, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
@@ -34,6 +34,7 @@ interface NotificationBellProps {
 	unreadCount: number
 	onMarkAsRead: (notificationIds: string[]) => void
 	onMarkAllAsRead: () => void
+	onClearAll: () => void
 	className?: string
 }
 
@@ -42,6 +43,7 @@ export function NotificationBell({
 	unreadCount,
 	onMarkAsRead,
 	onMarkAllAsRead,
+	onClearAll,
 	className,
 }: NotificationBellProps) {
 	const [isOpen, setIsOpen] = React.useState(false)
@@ -118,16 +120,31 @@ export function NotificationBell({
 					<DropdownMenuLabel className="font-semibold">
 						Notificações
 					</DropdownMenuLabel>
-					{unreadCount > 0 && (
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={onMarkAllAsRead}
-							className="text-xs h-auto p-1"
-						>
-							Marcar todas como lidas
-						</Button>
-					)}
+					<div className="flex items-center gap-1">
+						{unreadCount > 0 && (
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={onMarkAllAsRead}
+								className="text-xs h-auto p-1"
+								title="Marcar todas como lidas"
+							>
+								<Check className="h-3 w-3 mr-1" />
+								Marcar como lidas
+							</Button>
+						)}
+						{notifications.length > 0 && (
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={onClearAll}
+								className="text-xs h-auto p-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+								title="Limpar todas as notificações"
+							>
+								<Trash2 className="h-3 w-3" />
+							</Button>
+						)}
+					</div>
 				</div>
 				<DropdownMenuSeparator />
 				<div className="max-h-80 overflow-y-auto">

@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { DashboardClient } from '../../../components/dashboard-client'
 import { EmailVerificationBanner } from '@/components/email-verification-banner'
-import { Suspense } from 'react'
 
 // Force dynamic rendering since this page uses search params
 export const dynamic = 'force-dynamic'
