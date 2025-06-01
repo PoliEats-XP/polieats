@@ -201,29 +201,36 @@ export function NotificationProvider({
 								newNotification.type === 'ORDER_UPDATE' &&
 								newNotification.order
 							) {
-								queryClient.setQueryData(['orders'], (oldData: any) => {
-									if (!oldData) return oldData
+								try {
+									queryClient.setQueryData(['orders'], (oldData: any) => {
+										if (!oldData?.pages) return oldData
 
-									// Update the order in all pages
-									const updatedPages = oldData.pages.map((page: any) => ({
-										...page,
-										orders: page.orders.map((order: any) => {
-											if (order.id === newNotification.order.id) {
-												return {
-													...order,
-													status: newNotification.order.status,
-													total: newNotification.order.totalPrice,
-												}
+										// Update the order in all pages
+										const updatedPages = oldData.pages.map((page: any) => {
+											if (!page?.orders) return page
+											return {
+												...page,
+												orders: page.orders.map((order: any) => {
+													if (order.id === newNotification.order.id) {
+														return {
+															...order,
+															status: newNotification.order.status,
+															totalPrice: newNotification.order.totalPrice, // Use consistent naming
+														}
+													}
+													return order
+												}),
 											}
-											return order
-										}),
-									}))
+										})
 
-									return {
-										...oldData,
-										pages: updatedPages,
-									}
-								})
+										return {
+											...oldData,
+											pages: updatedPages,
+										}
+									})
+								} catch (error) {
+									console.error('Error updating orders cache:', error)
+								}
 							}
 						} else if (data.type === 'heartbeat') {
 							// Silent heartbeat, just keep the connection alive
