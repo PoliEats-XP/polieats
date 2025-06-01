@@ -20,6 +20,7 @@ export function NotificationBellWrapper() {
 	let unreadCount = 0
 	let markAsRead: (notificationIds: string[]) => Promise<void> = async () => {}
 	let markAllAsRead: () => Promise<void> = async () => {}
+	let clearAllNotifications: () => Promise<void> = async () => {}
 	let hasProvider = false
 
 	try {
@@ -28,6 +29,7 @@ export function NotificationBellWrapper() {
 		unreadCount = notificationContext.unreadCount
 		markAsRead = notificationContext.markAsRead
 		markAllAsRead = notificationContext.markAllAsRead
+		clearAllNotifications = notificationContext.clearAllNotifications
 		hasProvider = true
 	} catch (error) {
 		// Provider not available (user not logged in or provider missing)
@@ -53,6 +55,7 @@ export function NotificationBellWrapper() {
 			unreadCount={unreadCount}
 			onMarkAsRead={markAsRead}
 			onMarkAllAsRead={markAllAsRead}
+			onClearAll={clearAllNotifications}
 		/>
 	)
 }

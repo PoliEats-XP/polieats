@@ -9,6 +9,7 @@ import React, {
 	type ReactNode,
 } from 'react'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface Notification {
 	id: string
@@ -29,6 +30,7 @@ interface NotificationContextType {
 	unreadCount: number
 	markAsRead: (notificationIds: string[]) => Promise<void>
 	markAllAsRead: () => Promise<void>
+	clearAllNotifications: () => Promise<void>
 	refreshNotifications: () => Promise<void>
 }
 
@@ -57,6 +59,7 @@ export function NotificationProvider({
 }: NotificationProviderProps) {
 	const [notifications, setNotifications] = useState<Notification[]>([])
 	const [unreadCount, setUnreadCount] = useState(0)
+	const queryClient = useQueryClient()
 
 	// Fetch notifications from API
 	const fetchNotifications = useCallback(async () => {
@@ -112,6 +115,27 @@ export function NotificationProvider({
 			await markAsRead(unreadIds)
 		}
 	}, [notifications, markAsRead])
+
+	// Clear all notifications
+	const clearAllNotifications = useCallback(async () => {
+		try {
+			const response = await fetch('/api/notifications', {
+				method: 'DELETE',
+			})
+
+			if (response.ok) {
+				setNotifications([])
+				setUnreadCount(0)
+				toast.success('Todas as notificações foram removidas')
+			} else {
+				const { error } = await response.json().catch(() => ({}))
+				throw new Error(error ?? 'Falha ao limpar notificações')
+			}
+		} catch (error) {
+			console.error('Error clearing notifications:', error)
+			toast.error('Erro ao limpar notificações. Tente novamente.')
+		}
+	}, [])
 
 	// Set up SSE connection for real-time notifications
 	useEffect(() => {
@@ -176,6 +200,43 @@ export function NotificationProvider({
 								description: newNotification.message,
 								duration: 5000,
 							})
+
+							// If this is an order update notification, update the orders cache
+							if (
+								newNotification.type === 'ORDER_UPDATE' &&
+								newNotification.order
+							) {
+								try {
+									queryClient.setQueryData(['orders'], (oldData: any) => {
+										if (!oldData?.pages) return oldData
+
+										// Update the order in all pages
+										const updatedPages = oldData.pages.map((page: any) => {
+											if (!page?.orders) return page
+											return {
+												...page,
+												orders: page.orders.map((order: any) => {
+													if (order.id === newNotification.order.id) {
+														return {
+															...order,
+															status: newNotification.order.status,
+															totalPrice: newNotification.order.totalPrice, // Use consistent naming
+														}
+													}
+													return order
+												}),
+											}
+										})
+
+										return {
+											...oldData,
+											pages: updatedPages,
+										}
+									})
+								} catch (error) {
+									console.error('Error updating orders cache:', error)
+								}
+							}
 						} else if (data.type === 'heartbeat') {
 							// Silent heartbeat, just keep the connection alive
 							console.debug('Heartbeat received')
@@ -238,13 +299,14 @@ export function NotificationProvider({
 		connectSSE()
 
 		return cleanup
-	}, [userId, fetchNotifications])
+	}, [userId, fetchNotifications, queryClient])
 
 	const value: NotificationContextType = {
 		notifications,
 		unreadCount,
 		markAsRead,
 		markAllAsRead,
+		clearAllNotifications,
 		refreshNotifications: fetchNotifications,
 	}
 
