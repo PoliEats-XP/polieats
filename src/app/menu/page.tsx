@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { MenuClient } from '../../components/menu-client'
+import { MenuNavbar } from '../../components/menu-navbar'
 
 // Force dynamic rendering since this page uses search params
 export const dynamic = 'force-dynamic'
@@ -31,8 +32,11 @@ function MenuLoading() {
 
 export default function MenuPage() {
 	return (
-		<Suspense fallback={<MenuLoading />}>
-			<MenuClient />
-		</Suspense>
+		<>
+			<MenuNavbar />
+			<Suspense fallback={<MenuLoading />}>
+				<MenuClient />
+			</Suspense>
+		</>
 	)
 }

@@ -63,7 +63,7 @@ export function MenuClient() {
 
 	return (
 		<>
-			<Navbar variant="default" />
+			{/* <Navbar variant="master" /> */}
 
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
 				<div className="mb-8">

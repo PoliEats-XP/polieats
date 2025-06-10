@@ -9,7 +9,7 @@ import { NotificationBellWrapper } from './notification-wrapper'
 
 export type NavbarProps = {
 	variant?: 'default' | 'admin' | 'master'
-	activeLink?: 'orders' | 'menu' | null
+	activeLink?: 'orders' | 'menu' | 'user-menu' | null
 }
 
 export function Navbar({
@@ -21,7 +21,28 @@ export function Navbar({
 	const toggleMenu = () => setMenuOpen((prev) => !prev)
 
 	const renderLinks = () => {
-		if (variant === 'default') return null
+		// Default variant shows simple navigation for common users
+		if (variant === 'default') {
+			return (
+				<div className="flex items-center">
+					{activeLink === 'user-menu' ? (
+						<p className="bg-gradient-to-r from-gradient-from to-gradient-to text-transparent bg-clip-text flex items-center gap-2">
+							<ChefHat size={16} className="text-gradient-from" />
+							Menu
+						</p>
+					) : (
+						<Link
+							href="/menu"
+							className="hover:opacity-80 transition flex items-center gap-2"
+							title="Ver cardápio"
+						>
+							<ChefHat size={16} />
+							Menu
+						</Link>
+					)}
+				</div>
+			)
+		}
 
 		// Master users get access to all existing admin functionality
 		if (variant === 'master') {
@@ -35,10 +56,17 @@ export function Navbar({
 				},
 				{
 					key: 'menu',
-					label: 'Menu',
+					label: 'Menu Admin',
 					href: '/dashboard/menu',
 					icon: ChefHat,
 					description: 'Gerenciar cardápio e itens',
+				},
+				{
+					key: 'user-menu',
+					label: 'Menu',
+					href: '/menu',
+					icon: ChefHat,
+					description: 'Ver menu do usuário',
 				},
 			]
 
